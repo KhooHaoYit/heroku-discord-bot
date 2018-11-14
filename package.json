@@ -1,0 +1,15 @@
+{
+  "name": "backup-bot",
+  "version": "0.0.0",
+  "description": "backup bot",
+  "main": "app.js",
+  "author": {
+    "name": ""
+  },
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "erlpack": "github:discordapp/erlpack",
+    "libsodium-wrappers": "^0.7.3",
+    "zlib-sync": "^0.1.4"
+  }
+}
