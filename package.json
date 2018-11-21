@@ -9,7 +9,9 @@
   "dependencies": {
     "discord.js": "^11.4.2",
     "erlpack": "github:discordapp/erlpack",
+    "ffmpeg-binaries": "^4.0.0",
     "libsodium-wrappers": "^0.7.3",
+    "opusscript": "0.0.6",
     "zlib-sync": "^0.1.4"
   }
 }

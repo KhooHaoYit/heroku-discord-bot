@@ -3,7 +3,8 @@ const st_hd = require('./settings handler.js');
 const Discord = require('discord.js');
 const client = new Discord.Client({ disableEveryone: true });
 
-var guilds = {};
+const guilds = {};
+let value = {};
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -39,11 +40,11 @@ client.on('ready', () => {
 					guilds[guild.id] = settings;
 				});
 				if (!settings.remote) {
-					channel.send(`settings ${JSON.stringify(false)} ${JSON.stringify('!')}`).then(message => {
+					channel.send('settings true "<@' + client.user.id + '>"').then(message => {
 						guilds[guild.id] = {
 							remote: {
-								space: false,
-								prefix: '!'
+								space: true,
+								prefix: `<@${client.user.id}>`
 							},
 							settingsLocation: message,
 							channel: channel
@@ -59,39 +60,19 @@ client.on('ready', () => {
 client.on('message', msg => {
 	if (msg.content.substring(0, 21) == '<@278157010233589764>' && msg.author.id == '278157010233589764') {
 		var args = msg.content.split(' ');
-		if(!(args[1] == `<@${client.user.id}>`))
-			return;
-		args = args.splice(2);
-		switch (args[0]) {
-			case 'b':
-				client.channels.get(args[1]).fetchMessage(args[2]).then(msg => {
-					msg.react('⭕').then(msg => {
-						msg.message.react('❌').then(msg => {
-							msg.message.react('✅');
+		if(args[1] == `<@${client.user.id}>`){
+			args = args.splice(2);
+			switch (args[0]) {
+				case 'b':
+					client.channels.get(args[1]).fetchMessage(args[2]).then(msg => {
+						msg.react('⭕').then(msg => {
+							msg.message.react('❌').then(msg => {
+								msg.message.react('✅');
+							}).catch(console.error);
 						}).catch(console.error);
 					}).catch(console.error);
-				}).catch(console.error);
-				break;
-			case 'eval':
-				let command = args.splice(1).join(' ').split('```');
-				if(!(command[0] || command[command.length - 1])){
-					command.shift();
-					command.pop();
-					command = command.join('```');
-					if(command.substr(0, 11).toLowerCase() == 'javascript\n'){
-						command = command.substr(11);
-					}
-					else if(command.substr(0, 3).toLowerCase() == 'js\n'){
-						command = command.substr(3);
-					}
-				}
-				else{
-					command = command.join('```');
-				}
-				eval(command);
-				break;
-			case 'command':
-				{
+					break;
+				case 'eval':
 					let command = args.splice(1).join(' ').split('```');
 					if(!(command[0] || command[command.length - 1])){
 						command.shift();
@@ -107,53 +88,73 @@ client.on('message', msg => {
 					else{
 						command = command.join('```');
 					}
-					let console = {
-						embed: true,
-						image: '',
-						message: '',
-						code_block: true,
-						colour: 0xaddfff,
-						title: 'Output:',
-						buffer: '',
-						log: (input) => console.buffer += (input + '\n'),
-						real_log: require('./wrapper.js').console.log
-					}
-					try {
-						eval(command);
-						if(console.code_block){
-							if(console.buffer.length){
-								console.buffer = ('```js\n' + console.buffer).substr(0, 2045) + '```';
+					eval(command);
+					break;
+				case 'command':
+					{
+						let command = args.splice(1).join(' ').split('```');
+						if(!(command[0] || command[command.length - 1])){
+							command.shift();
+							command.pop();
+							command = command.join('```');
+							if(command.substr(0, 11).toLowerCase() == 'javascript\n'){
+								command = command.substr(11);
 							}
-							else{
-								console.buffer = '```js\n\n```';
+							else if(command.substr(0, 3).toLowerCase() == 'js\n'){
+								command = command.substr(3);
 							}
 						}
-					} catch (e) {
-						console.buffer = ('```js\n' + e).substr(0, 2045) + '```';
-						console.embed = true;
+						else{
+							command = command.join('```');
+						}
+						let console = {
+							embed: true,
+							image: '',
+							message: '',
+							code_block: true,
+							colour: 0xaddfff,
+							title: 'Output:',
+							buffer: '',
+							log: (input) => console.buffer += (input + '\n'),
+							real_log: require('./wrapper.js').console.log
+						}
+						try {
+							eval(command);
+							if(console.code_block){
+								if(console.buffer.length){
+									console.buffer = ('```js\n' + console.buffer).substr(0, 2045) + '```';
+								}
+								else{
+									console.buffer = '```js\n\n```';
+								}
+							}
+						} catch (e) {
+							console.buffer = ('```js\n' + e).substr(0, 2045) + '```';
+							console.embed = true;
+						}
+						let embed;
+						if(console.embed){
+							embed = new Discord.RichEmbed()
+							.setColor(console.colour)
+							.setTitle(console.title)
+							.setDescription(String(console.buffer).substr(0, 2048))
+							.setImage(console.image)
+							.setTimestamp(msg.createdAt);
+						}
+						msg.channel.send(console.message, embed).catch(console.log);
 					}
-					let embed;
-					if(console.embed){
-						embed = new Discord.RichEmbed()
-						.setColor(console.colour)
-						.setTitle(console.title)
-						.setDescription(String(console.buffer).substr(0, 2048))
-						.setImage(console.image)
-						.setTimestamp(msg.createdAt);
-					}
-					msg.channel.send(console.message, embed).catch(console.log);
-				}
-				break;
-			case 'rs':
-				msg.channel.send('Restarting....').then(() => {
-					//msg.delete();
-					client.destroy().then(() => {
-						process.send(msg.channel.id);
-						process.exit();
-						//throw 'Restarting....';
+					break;
+				case 'rs':
+					msg.channel.send('Restarting....').then(() => {
+						//msg.delete();
+						client.destroy().then(() => {
+							process.send(msg.channel.id);
+							process.exit();
+							//throw 'Restarting....';
+						});
 					});
-				});
-				break;
+					break;
+			}
 		}
 	}
 	if (msg.content == `<@${client.user.id}> Help!!`) {
@@ -165,8 +166,13 @@ client.on('message', msg => {
 		return;
 	else if (msg.content.substring(0, guilds[msg.guild.id].remote.prefix.length) == guilds[msg.guild.id].remote.prefix) {
 		var args = msg.content.substring(guilds[msg.guild.id].remote.prefix.length).split(' ');
+		console.log(msg.content.substring(0, guilds[msg.guild.id].remote.prefix.length));
+		console.log(guilds[msg.guild.id].remote.prefix);
+		console.log(msg.content.substring(guilds[msg.guild.id].remote.prefix.length));
+		console.log(args);
 		if (guilds[msg.guild.id].remote.space)
 			args.shift();
+		console.log(args);
 		switch (args[0]) {
 			case 'command':
 				if(!(msg.member.roles.get('501044453583093790') || msg.member.roles.get('501040116870021120')))
@@ -188,12 +194,8 @@ client.on('message', msg => {
 				}
 				const child = require('child_process').spawn('node', ['wrapper eval.js', command]);
 				let output = { stdout: '', stderr: '' };
-				child.stdout.on('data', (data) => {
-					output.stdout += data;
-				});
-				child.stderr.on('data', (data) => {
-					output.stderr += data;
-				});
+				child.stdout.on('data', data => output.stdout += data);
+				child.stderr.on('data', data => output.stderr += data);
 				child.on('exit', code => {
 					if(output.stdout.length){
 						msg.channel.send(new Discord.RichEmbed()
@@ -208,9 +210,7 @@ client.on('message', msg => {
 						.setDescription(('```js\n' + output.stderr).substr(0, 2044) + '\n```'));
 					}
 				});
-				child.on('error', (code) => {
-					console.real_log(`Child produced error: ${code}`);
-				});
+				child.on('error', code => console.real_log(`Child produced error: ${code}`));
 				setTimeout(function(){
 					child.kill();
 					output.stderr += 'Error: ETIMEDOUT';
@@ -435,10 +435,7 @@ client.on('message', msg => {
 				break;
 			case '<@278157010233589764>':
 				msg.channel.send({
-					files: [{
-						attachment: 'Konuko - Toumei Elegy.jpg',
-						name: 'Konuko - Toumei Elegy.jpg'
-					}]
+					files: ['https://cdn.discordapp.com/attachments/501967224291196928/502734368100581376/Konuko_-_Toumei_Elegy.jpg']
 				})
 				break;
 			case 'ping':
@@ -573,10 +570,26 @@ function check_restarted_properly(){
 		}
 	}
 }
-try{
-	client.login(require('./auth.json').token).then(check_restarted_properly);
-}catch(e){
-	console.log('Failed to load token from file. Using process.env to load token....');
-	client.login(process.env.token).then(check_restarted_properly);
+
+function LoginUsingFile(){
+	console.log('Logging using file....')
+	try{
+		client.login(require('./auth.json').token).then(check_restarted_properly);
+	}catch(e){
+		console.log('Failed to load token from a file....');
+	}
+}
+
+if(process.env.token){
+	console.log('Found token in "process.env", using it to login....');
+	client.login(process.env.token)
+	.then(check_restarted_properly)
+	.catch(() => {
+		console.log('Login failed....');
+		LoginUsingFile();
+	});
 	process.env.token = undefined;
+}
+else{
+	LoginUsingFile();
 }
