@@ -145,14 +145,16 @@ client.on('message', msg => {
 					}
 					break;
 				case 'rs':
-					msg.channel.send('Restarting....').then(() => {
-						//msg.delete();
-						client.destroy().then(() => {
-							process.send(msg.channel.id);
-							process.exit();
-							//throw 'Restarting....';
+					if(args[1] == process.pid){
+						msg.channel.send('Restarting....').then(() => {
+							//msg.delete();
+							client.destroy().then(() => {
+								process.send(msg.channel.id);
+								process.exit();
+								//throw 'Restarting....';
+							});
 						});
-					});
+					}
 					break;
 			}
 		}
@@ -160,19 +162,12 @@ client.on('message', msg => {
 	if (msg.content == `<@${client.user.id}> Help!!`) {
 		msg.channel.send(`${guilds[msg.guild.id].remote.prefix + (guilds[msg.guild.id].remote.space ? ' ' : '')}COMMAND`);
 	}
-	if (!msg.guild)
-		return;
-	if (!guilds[msg.guild.id] || msg.author.bot)
+	if (msg.author.bot || !msg.guild || !guilds[msg.guild.id])
 		return;
 	else if (msg.content.substring(0, guilds[msg.guild.id].remote.prefix.length) == guilds[msg.guild.id].remote.prefix) {
 		var args = msg.content.substring(guilds[msg.guild.id].remote.prefix.length).split(' ');
-		console.log(msg.content.substring(0, guilds[msg.guild.id].remote.prefix.length));
-		console.log(guilds[msg.guild.id].remote.prefix);
-		console.log(msg.content.substring(guilds[msg.guild.id].remote.prefix.length));
-		console.log(args);
 		if (guilds[msg.guild.id].remote.space)
 			args.shift();
-		console.log(args);
 		switch (args[0]) {
 			case 'command':
 				if(!(msg.member.roles.get('501044453583093790') || msg.member.roles.get('501040116870021120')))
