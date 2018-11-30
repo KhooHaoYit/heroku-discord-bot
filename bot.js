@@ -4,7 +4,8 @@ const Discord = require('discord.js');
 const client = new Discord.Client({ disableEveryone: true });
 
 const guilds = {};
-let value = {};
+const value = {};
+const beta = {};
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -169,6 +170,12 @@ client.on('message', msg => {
 		if (guilds[msg.guild.id].remote.space)
 			args.shift();
 		switch (args[0]) {
+			case 'beta':
+				let command = beta[args[1]];
+				if(command){
+					command(msg, ...args.splice(2));
+				}
+				break;
 			case 'command':
 				if(!(msg.member.roles.get('501044453583093790') || msg.member.roles.get('501040116870021120')))
 					return;
