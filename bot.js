@@ -170,13 +170,13 @@ client.on('message', msg => {
 		if (guilds[msg.guild.id].remote.space)
 			args.shift();
 		switch (args[0]) {
-			case 'beta':
+			case 'beta':{
 				let command = beta[args[1]];
 				if(command){
 					command(msg, ...args.splice(2));
 				}
 				break;
-			case 'command':
+			}case 'command':{
 				if(!(msg.member.roles.get('501044453583093790') || msg.member.roles.get('501040116870021120')))
 					return;
 				let command = args.splice(1).join(' ').split('```');
@@ -218,7 +218,7 @@ client.on('message', msg => {
 					output.stderr += 'Error: ETIMEDOUT';
 				}, 1000);
 				break;
-			case 'set':
+			}case 'set':
 				if (!msg.member.permissions.has('ADMINISTRATOR'))
 					return;
 				switch (args[1]) {
