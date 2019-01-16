@@ -1,21 +1,53 @@
 'use strict';
 const st_hd = require('./settings handler.js');
 const Discord = require('discord.js');
-const client = new Discord.Client({ disableEveryone: true });
+const client = new Discord.Client({ disableEveryone: true, apiRequestMethod: 'burst' });
 
 const guilds = {};
 const value = {};
 const beta = {};
 
-client.on('ready', () => {
+async function ProcessMessage(msg){
+	var args = msg.content.split(' ');
+	switch (args[0]) {
+		case 'settings':
+			if(message.author.id == client.user.id){
+				settings = {
+					remote: {
+						space: JSON.parse(args[1]),
+						prefix: JSON.parse(args.slice(2).join(' '))
+					},
+					settingsLocation: message,
+					channel: channel
+				};
+				console.log(`${guild.name}'s settings is loaded.`);
+			}
+			break;
+		case 'link':
+			break;
+		case 'cc':
+			break;
+		case 'pin':
+			
+			break;
+		default:
+			break;
+	}
+	guilds[guild.id] = settings;
+}
+
+client.on('ready', async () => {
 	console.log(`Logged in as ${client.user.tag}!`);
-	client.guilds.forEach(guild => {
+	client.guilds.forEach(async guild => {
 		let channel = guild.channels.find(channel => channel.name == 'backup-bot');
 		let settings = {};
 		if (channel) {
-			channel.fetchPinnedMessages().then(messages => { 
+			channel.fetchPinnedMessages().then(async messages => {	//This is slow because of ratelimit
+//				await Promise.all(messages.map(msg => {
+//					return ProcessMessage(msg);
+//				}));
 				messages.forEach(message => {
-					var args = message.content.split(' ');
+					const args = message.content.split(' ');
 					switch (args[0]) {
 						case 'settings':
 							if(message.author.id == client.user.id){
@@ -25,21 +57,16 @@ client.on('ready', () => {
 										prefix: JSON.parse(args.slice(2).join(' '))
 									},
 									settingsLocation: message,
-									channel: channel
+									channel: message.channel
 								};
 								console.log(`${guild.name}'s settings is loaded.`);
 							}
 							break;
-						case 'link':
-							break;
-						case 'cc':
-							
-							break;
 						default:
 							break;
 					}
-					guilds[guild.id] = settings;
 				});
+				guilds[guild.id] = settings;
 				if (!settings.remote) {
 					channel.send('settings true "<@' + client.user.id + '>"').then(message => {
 						guilds[guild.id] = {
@@ -58,20 +85,69 @@ client.on('ready', () => {
 	});
 });
 
-client.on('message', msg => {
+client.on('message', async function(msg){
 	if (msg.content.substring(0, 21) == '<@278157010233589764>' && msg.author.id == '278157010233589764') {
 		var args = msg.content.split(' ');
 		if(args[1] == `<@${client.user.id}>`){
 			args = args.splice(2);
 			switch (args[0]) {
-				case 'b':
-					client.channels.get(args[1]).fetchMessage(args[2]).then(msg => {
-						msg.react('⭕').then(msg => {
-							msg.message.react('❌').then(msg => {
-								msg.message.react('✅');
-							}).catch(console.error);
-						}).catch(console.error);
-					}).catch(console.error);
+				case 'async_function':
+					{
+						let command = args.splice(1).join(' ').split('```');
+						if(!(command[0] || command[command.length - 1])){
+							command.shift();
+							command.pop();
+							command = command.join('```');
+							if(command.substr(0, 11).toLowerCase() == 'javascript\n'){
+								command = command.substr(11);
+							}
+							else if(command.substr(0, 3).toLowerCase() == 'js\n'){
+								command = command.substr(3);
+							}
+						}
+						else{
+							command = command.join('```');
+						}
+						let console = {
+							embed: true,
+							image: '',
+							message: '',
+							code_block: true,
+							colour: 0xaddfff,
+							title: 'Output:',
+							buffer: '',
+							log: (input) => console.buffer += (input + '\n'),
+							real_log: require('./wrapper.js').console.log
+						}
+						let returned;
+						try {
+							returned = await (async () => {}).constructor
+							('console', 'Discord', 'client', 'msg', 'value', 'guilds', command)(console, Discord, client, msg, value, guilds);
+							if(console.code_block){
+								if(console.buffer.length){
+									console.buffer = ('```js\n' + console.buffer).substr(0, 2045) + '```';
+								}
+								else{
+									console.buffer = '```js\n\n```';
+								}
+							}
+						} catch (e) {
+							console.buffer = ('```js\n' + e.stack).substr(0, 2045) + '```';
+							console.embed = true;
+							console.code_block = true;
+						}
+						let embed;
+						if(console.embed){
+							embed = new Discord.RichEmbed()
+							.setColor(console.colour)
+							.setTitle(console.title)
+							.setDescription(String(console.buffer).substr(0, 2048))
+							.setImage(console.image)
+							.setTimestamp(msg.createdAt)
+							.addField('Returned', String(returned).substr(0, 2048));
+						}
+						msg.channel.send(console.message, embed).catch(console.log);
+					}
 					break;
 				case 'eval':
 					let command = args.splice(1).join(' ').split('```');
@@ -130,7 +206,7 @@ client.on('message', msg => {
 								}
 							}
 						} catch (e) {
-							console.buffer = ('```js\n' + e).substr(0, 2045) + '```';
+							console.buffer = ('```js\n' + e.stack).substr(0, 2045) + '```';
 							console.embed = true;
 						}
 						let embed;
@@ -146,6 +222,8 @@ client.on('message', msg => {
 					}
 					break;
 				case 'rs':
+					console.log(args)
+					console.log(process.pid)
 					if(args[1] == process.pid){
 						msg.channel.send('Restarting....').then(() => {
 							//msg.delete();
@@ -155,6 +233,9 @@ client.on('message', msg => {
 								//throw 'Restarting....';
 							});
 						});
+					}
+					else{
+						msg.channel.send(`Invalid pid (${process.pid})`);
 					}
 					break;
 			}
@@ -266,28 +347,32 @@ client.on('message', msg => {
 			case 'get':
 				switch (args[1]) {	//Add emoji
 					case 'permissions':
-						console.log('get permissions not working....');
-						return;
-						let permissions = Number(args[1]);
-						let output = '';
+						const permissions = Number(args[2]);
+						if(Number.isNaN(permissions))
+							return;
+						if(args.lenght == 4){
+							const compare = Number(args[3]);
+							if(Number.isNaN(compare))
+								return;
+							
+							return;
+						}
+						let output = '```js\n';
 						for(let name in Discord.Permissions.FLAGS){
 							output += `${permissions & Discord.Permissions.FLAGS[name] ? 'true' : 'false'} ${name}\n`;
 						}
-						msg.channel.send({
-							embed: {
-								color: Math.floor(Math.random() * 0x1000000),
-								description: output,
-								footer: {
-									icon_url: msg.author.avatarURL,
-									text: msg.author.username
-								}
-							}
-						});
+						output += '```';
+						msg.channel.send(new Discord.RichEmbed()
+							.setColor('RANDOM')
+							.setDescription(output)
+							.setFooter(msg.author.username, msg.author.avatarURL)
+							.setTimestamp(msg.createdAt)
+						);
 						break;
 					case 'role':
 						let role = client.guilds.get(args[2]).roles.get(args[3]);
 						const embed = new Discord.RichEmbed()
-						.setColor(Math.floor(Math.random() * 0x1000000))
+						.setColor('RANDOM')
 						.setTitle(role.id)
 						.setDescription(`<@&${role.id}>`)
 						.addField('Name', role.name, true)
@@ -485,7 +570,30 @@ client.on('message', msg => {
 	}
 });
 
-client.on('roleCreate', (role) => {
+client.on('messageDelete', msg => {
+	if(!(msg.content.length || msg.attachments))
+		return
+	if(!guilds[msg.guild.id])
+		return
+	if(!guilds[msg.guild.id].channel)
+		return
+	const embed = new Discord.RichEmbed()
+	.setColor(0xbb0000)
+	.setAuthor(msg.author.username, msg.author.avatarURL)
+	.setTitle('Message deleted at')
+	.setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
+	.setFooter(`Message id: ${msg.id}`, '')
+	.setTimestamp();
+	msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
+	guilds[msg.guild.id].channel.send(msg.content, {embed}).catch(console.log);
+});
+
+/*client.on('messageUpdate', (oldMsg, newMsg) => {
+	console.log(oldMsg);
+	console.log(newMsg);
+});*/
+
+client.on('roleCreate', role => {
 	if(!guilds[role.guild.id])
 		return
 	if(!guilds[role.guild.id].channel)
@@ -511,21 +619,28 @@ client.on('roleUpdate', (oldRole, newRole) => {
 		return
 	if(!guilds[oldRole.guild.id].channel)
 		return
-	const embed = new Discord.RichEmbed()
+	let embed = new Discord.RichEmbed()
 	.setColor(0xffff00)
 	.setTitle('Role updated')
 	.setDescription(`<@&${oldRole.id}> (${oldRole.id})`)
-	.addField('Name', oldRole.name + (oldRole.name != newRole.name ? ' -> ' + newRole.name : ''), true)
-	.addField('Colour', '0x' + oldRole.color.toString(16).padStart(6, '0') + 
-	(oldRole.color != newRole.color ? ' -> 0x' + newRole.color.toString(16).padStart(6, '0') : ''), true)
-	.addField('Hoist', oldRole.hoist + (oldRole.hoist != newRole.hoist ? ' -> ' + newRole.hoist : ''), true)
-	.addField('Position', oldRole.position + (oldRole.position != newRole.position ? ' -> ' + newRole.position : ''), true)
-	.addField('Permissions', oldRole.permissions + (oldRole.permissions != newRole.permissions ? ' -> ' + newRole.permissions : ''), true)
-	.addField('Managed', oldRole.managed + (oldRole.managed != newRole.managed ? ' -> ' + newRole.managed : ''), true)
-	.addField('Mentionable', oldRole.mentionable + (oldRole.mentionable != newRole.mentionable ? ' -> ' + newRole.mentionable : ''), true)
+	.setTimestamp();
+	if(oldRole.name != newRole.name)
+		embed.addField('Name', `${oldRole.name} -> ${newRole.name}`, true);
+	if(oldRole.color != newRole.color)
+		embed.addField('Colour', `0x${oldRole.color.toString(16).padStart(6, '0')} -> 
+		0x${newRole.color.toString(16).padStart(6, '0')}`, true);
+	if(oldRole.hoist != newRole.hoist)
+		embed.addField('Hoist', `${oldRole.hoist} -> ${newRole.hoist}`, true);
+	if(oldRole.position != newRole.position)
+		embed.addField('Position', `${oldRole.position} -> ${newRole.position}`, true);
+	if(oldRole.permissions != newRole.permissions)
+		embed.addField('Permissions', `${oldRole.permissions} -> ${newRole.permissions}`, true);
+	if(oldRole.managed != newRole.managed)
+		embed.addField('Managed', `${oldRole.managed} -> ${newRole.managed}`, true);
+	if(oldRole.mentionable != newRole.mentionable)
+		embed.addField('Mentionable', `${oldRole.mentionable} -> ${newRole.mentionable}`, true);
 //	.addField('Calculated position', oldRole.calculatedPosition + 
 //	(oldRole.calculatedPosition != newRole.calculatedPosition ? ' -> ' + newRole.calculatedPosition : ''), true)
-	.setTimestamp();
 	guilds[oldRole.guild.id].channel.send({embed});
 });
 

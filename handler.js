@@ -1,4 +1,4 @@
-function DecodeURL(URL){
+module.exports.DecodeDiscordURL = function(URL){
 	let args = URL.split('/');
 	switch(args[3]){
 		case 'avatars':
@@ -25,7 +25,7 @@ function DecodeURL(URL){
 	}
 }
 
-function GetUser(input, message, client){
+module.exports.GetUser = function(input, message, client){
 	let args = input.split(' ');
 	switch(args.length){
 		case 1:
@@ -44,6 +44,6 @@ function GetUser(input, message, client){
 	return null;
 }
 
-module.exports = {
+module.exports.get = function(expected){
 	
 }
