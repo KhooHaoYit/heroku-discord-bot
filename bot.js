@@ -582,15 +582,29 @@ client.on('messageDelete', msg => {
 	.setAuthor(msg.author.username, msg.author.avatarURL)
 	.setTitle('Message deleted at')
 	.setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
+	.addField('Content', msg.content || '_ _')
 	.setFooter(`Message id: ${msg.id}`, '')
 	.setTimestamp();
 	msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
-	guilds[msg.guild.id].channel.send(msg.content, {embed}).catch(console.log);
+	guilds[msg.guild.id].channel.send({embed}).catch(console.log);
 });
 
 /*client.on('messageUpdate', (oldMsg, newMsg) => {
-	console.log(oldMsg);
-	console.log(newMsg);
+	console.log('Update');
+	if(!guilds[oldMsg.guild.id])
+		return
+	if(!guilds[oldMsg.guild.id].channel)
+		return
+	const embed = new Discord.RichEmbed()
+	.setColor(0xff9900)
+	.setAuthor(oldMsg.author.username, oldMsg.author.avatarURL)
+	.setTitle('Message edited at')
+	.setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
+	.addField('Old content', newMsg.content + '_ _')	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
+	.addField('New content', newMsg.content + '_ _')
+	.setFooter(`Message id: ${oldMsg.id}`, '')
+	.setTimestamp();
+	guilds[oldMsg.guild.id].channel.send({embed}).catch(console.log);
 });*/
 
 client.on('roleCreate', role => {
