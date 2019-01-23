@@ -205,8 +205,8 @@ client.on('message', async function(msg){
 									console.buffer = '```js\n\n```';
 								}
 							}
-						} catch (e) {
-							console.buffer = ('```js\n' + e.stack).substr(0, 2045) + '```';
+						} catch (err) {
+							console.buffer = ('```js\n' + err.stack).substr(0, 2045) + '```';
 							console.embed = true;
 						}
 						let embed;
@@ -589,8 +589,9 @@ client.on('messageDelete', msg => {
 	guilds[msg.guild.id].channel.send({embed}).catch(console.log);
 });
 
-/*client.on('messageUpdate', (oldMsg, newMsg) => {
-	console.log('Update');
+client.on('messageUpdate', (oldMsg, newMsg) => {
+	if(oldMsg.content == newMsg.content)
+		return
 	if(!guilds[oldMsg.guild.id])
 		return
 	if(!guilds[oldMsg.guild.id].channel)
@@ -600,12 +601,12 @@ client.on('messageDelete', msg => {
 	.setAuthor(oldMsg.author.username, oldMsg.author.avatarURL)
 	.setTitle('Message edited at')
 	.setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
-	.addField('Old content', newMsg.content + '_ _')	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
+	.addField('Old content', oldMsg.content + '_ _')	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
 	.addField('New content', newMsg.content + '_ _')
 	.setFooter(`Message id: ${oldMsg.id}`, '')
-	.setTimestamp();
+	.setTimestamp();	//newMsg.editedAt
 	guilds[oldMsg.guild.id].channel.send({embed}).catch(console.log);
-});*/
+});
 
 client.on('roleCreate', role => {
 	if(!guilds[role.guild.id])
