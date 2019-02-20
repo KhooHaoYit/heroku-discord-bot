@@ -721,9 +721,9 @@ client.on('channelDelete', (channel) => {
 });
 
 client.on('guildMemberUpdate', (oldMember, newMember) => {
-	if(!guilds[role.guild.id])
+	if(!guilds[oldMember.guild.id])
 		return
-	if(!guilds[role.guild.id].channel)
+	if(!guilds[oldMember.guild.id].channel)
 		return
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff0000)
@@ -736,7 +736,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 	else{
 		return;
 	}
-	guilds[role.guild.id].channel.send({embed});
+	guilds[oldMember.guild.id].channel.send({embed});
 });
 
 function check_restarted_properly(){
