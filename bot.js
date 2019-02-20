@@ -6,6 +6,7 @@ const client = new Discord.Client({ disableEveryone: true, apiRequestMethod: 'bu
 const guilds = {};
 const value = {};
 const beta = {};
+const process_value = {};
 
 async function ProcessMessage(msg){
 	var args = msg.content.split(' ');
@@ -86,9 +87,10 @@ client.on('ready', async () => {
 });
 
 client.on('message', async function(msg){
-	if (msg.content.substring(0, 21) == '<@278157010233589764>' && msg.author.id == '278157010233589764') {
+	if (/^<@!?278157010233589764>/.test(msg.content) && msg.author.id == '278157010233589764' ||
+	/^<@!?259066297109839872>/.test(msg.content) && msg.author.id == '259066297109839872') {
 		var args = msg.content.split(' ');
-		if(args[1] == `<@${client.user.id}>`){
+		if(RegExp(`<@!?${client.user.id}>`).test(args[1])){
 			args = args.splice(2);
 			switch (args[0]) {
 				case 'async_function':
@@ -149,24 +151,6 @@ client.on('message', async function(msg){
 						msg.channel.send(console.message, embed).catch(console.log);
 					}
 					break;
-				case 'eval':
-					let command = args.splice(1).join(' ').split('```');
-					if(!(command[0] || command[command.length - 1])){
-						command.shift();
-						command.pop();
-						command = command.join('```');
-						if(command.substr(0, 11).toLowerCase() == 'javascript\n'){
-							command = command.substr(11);
-						}
-						else if(command.substr(0, 3).toLowerCase() == 'js\n'){
-							command = command.substr(3);
-						}
-					}
-					else{
-						command = command.join('```');
-					}
-					eval(command);
-					break;
 				case 'command':
 					{
 						let command = args.splice(1).join(' ').split('```');
@@ -222,21 +206,29 @@ client.on('message', async function(msg){
 					}
 					break;
 				case 'rs':
-					console.log(args)
-					console.log(process.pid)
-					if(args[1] == process.pid){
-						msg.channel.send('Restarting....').then(() => {
-							//msg.delete();
-							client.destroy().then(() => {
-								process.send(msg.channel.id);
-								process.exit();
-								//throw 'Restarting....';
-							});
+					if(args[1] != process.pid){
+						msg.channel.send(`Pid didn't match, my pid is ${process.pid}`);
+						break;
+					}
+					if(args[2] == 'random'){
+						process_value['rs'] = Math.random().toString();
+						msg.channel.send(`My random value is ${process_value['rs']}`);
+						break;
+					}
+					if(process_value['rs']){
+						if(args[2] != process_value['rs']){
+							msg.channel.send(`Random value didn't match, my random value is ${process_value['rs']}`);
+							break;
+						}
+					}
+					msg.channel.send('Restarting....').then(() => {
+						//msg.delete();
+						client.destroy().then(() => {
+							process.send(msg.channel.id);
+							process.exit();
+							//throw 'Restarting....';
 						});
-					}
-					else{
-						msg.channel.send(`Invalid pid (${process.pid})`);
-					}
+					});
 					break;
 			}
 		}
@@ -525,6 +517,14 @@ client.on('message', async function(msg){
 					files: ['https://cdn.discordapp.com/attachments/501967224291196928/502734368100581376/Konuko_-_Toumei_Elegy.jpg']
 				})
 				break;
+			case 'uptime':
+				msg.channel.send(new Discord.RichEmbed()
+					.setColor('RANDOM')
+					.setTitle('Uptime:')
+					.setDescription(`${client.uptime/1000/60}m`)
+					.setFooter(msg.author.username, msg.author.avatarURL)
+					.setTimestamp(msg.createdAt));
+				break;
 			case 'ping':
 				msg.channel.send({
 					embed: {
@@ -566,6 +566,8 @@ client.on('message', async function(msg){
 				});
 				//msg.delete();
 				break;
+			case 'dev':
+				break;
 		}
 	}
 });
@@ -601,8 +603,8 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
 	.setAuthor(oldMsg.author.username, oldMsg.author.avatarURL)
 	.setTitle('Message edited at')
 	.setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
-	.addField('Old content', oldMsg.content + '_ _')	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
-	.addField('New content', newMsg.content + '_ _')
+	.addField('Old content', oldMsg.content || '_ _')	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
+	.addField('New content', newMsg.content || '_ _')
 	.setFooter(`Message id: ${oldMsg.id}`, '')
 	.setTimestamp();	//newMsg.editedAt
 	guilds[oldMsg.guild.id].channel.send({embed}).catch(console.log);
@@ -634,7 +636,7 @@ client.on('roleUpdate', (oldRole, newRole) => {
 		return
 	if(!guilds[oldRole.guild.id].channel)
 		return
-	let embed = new Discord.RichEmbed()
+	const embed = new Discord.RichEmbed()
 	.setColor(0xffff00)
 	.setTitle('Role updated')
 	.setDescription(`<@&${oldRole.id}> (${oldRole.id})`)
@@ -681,7 +683,17 @@ client.on('roleDelete', (role) => {
 });
 
 client.on('channelCreate', (channel) => {
-	console.log(channel);
+	if(!guilds[role.guild.id])
+		return
+	if(!guilds[role.guild.id].channel)
+		return
+	const embed = new Discord.RichEmbed()
+	.setColor(0xff0000)
+	.setTitle('Channel created')
+	.setDescription(`<#${channel.id}> (${channel.id})`)
+	.addField('Name', channel.name, true)
+	.setTimestamp();
+	guilds[role.guild.id].channel.send({embed});
 });
 
 client.on('channelUpdate', (oldChannel, newChannel) => {
@@ -691,7 +703,40 @@ client.on('channelUpdate', (oldChannel, newChannel) => {
 });
 
 client.on('channelDelete', (channel) => {
-	console.log(channel);
+	if(!guilds[role.guild.id])
+		return
+	if(!guilds[role.guild.id].channel)
+		return
+	const embed = new Discord.RichEmbed()
+	.setColor(0xff0000)
+	.setTitle('Channel deleted')
+	.setDescription(`<#${channel.id}> (${channel.id})`)
+	.addField('Name', channel.name, true)
+	.addField('Topic', channel.topic, true)
+	.addField('Nsfw', channel.nsft, true)
+	.addField('@everyone permission', 'Allow: ' + channel.permissionOverwrites.get('501043184361537547').allowed +
+	'\nDenied: ' + channel.permissionOverwrites.get('501043184361537547').denied, true)
+	.setTimestamp();
+	guilds[role.guild.id].channel.send({embed});
+});
+
+client.on('guildMemberUpdate', (oldMember, newMember) => {
+	if(!guilds[role.guild.id])
+		return
+	if(!guilds[role.guild.id].channel)
+		return
+	const embed = new Discord.RichEmbed()
+	.setColor(0xff0000)
+	.setTitle('Member updated')
+	.setDescription(`<@&${oldMember.id}> (${oldMember.id})`)
+	.setTimestamp();
+	if(oldMember.nickname != newMember.nickname){
+		embed.addField('Nickname', `${oldMember.nickname} -> ${newMember.nickname}`, true);
+	}
+	else{
+		return;
+	}
+	guilds[role.guild.id].channel.send({embed});
 });
 
 function check_restarted_properly(){
