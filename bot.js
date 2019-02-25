@@ -124,7 +124,7 @@ client.on('message', async function(msg){
 						let returned;
 						try {
 							returned = await (async () => {}).constructor
-							('console', 'Discord', 'client', 'msg', 'value', 'guilds', command)(console, Discord, client, msg, value, guilds);
+							('require', 'console', 'Discord', 'client', 'msg', 'value', 'guilds', command)(require, console, Discord, client, msg, value, guilds);
 							if(console.code_block){
 								if(console.buffer.length){
 									console.buffer = ('```js\n' + console.buffer).substr(0, 2045) + '```';
@@ -605,6 +605,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
 	.setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
 	.addField('Old content', oldMsg.content || '_ _')	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
 	.addField('New content', newMsg.content || '_ _')
+	.addField('Link to message', newMsg.url)
 	.setFooter(`Message id: ${oldMsg.id}`, '')
 	.setTimestamp();	//newMsg.editedAt
 	guilds[oldMsg.guild.id].channel.send({embed}).catch(console.log);
@@ -728,7 +729,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff0000)
 	.setTitle('Member updated')
-	.setDescription(`<@&${oldMember.id}> (${oldMember.id})`)
+	.setDescription(`<@${oldMember.id}> (${oldMember.id})`)
 	.setTimestamp();
 	if(oldMember.nickname != newMember.nickname){
 		embed.addField('Nickname', `${oldMember.nickname} -> ${newMember.nickname}`, true);
