@@ -573,7 +573,7 @@ client.on('message', async function(msg){
 });
 
 client.on('messageDelete', msg => {
-	if(!(msg.content.length || msg.attachments))
+	if(channel.guild)
 		return
 	if(!guilds[msg.guild.id])
 		return
@@ -592,11 +592,13 @@ client.on('messageDelete', msg => {
 });
 
 client.on('messageUpdate', (oldMsg, newMsg) => {
-	if(oldMsg.content == newMsg.content)
+	if(channel.guild)
 		return
 	if(!guilds[oldMsg.guild.id])
 		return
 	if(!guilds[oldMsg.guild.id].channel)
+		return
+	if(oldMsg.content == newMsg.content)
 		return
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff9900)
@@ -612,6 +614,8 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
 });
 
 client.on('roleCreate', role => {
+	if(channel.guild)
+		return
 	if(!guilds[role.guild.id])
 		return
 	if(!guilds[role.guild.id].channel)
@@ -633,6 +637,8 @@ client.on('roleCreate', role => {
 });
 
 client.on('roleUpdate', (oldRole, newRole) => {
+	if(channel.guild)
+		return
 	if(!guilds[oldRole.guild.id])
 		return
 	if(!guilds[oldRole.guild.id].channel)
@@ -663,6 +669,8 @@ client.on('roleUpdate', (oldRole, newRole) => {
 });
 
 client.on('roleDelete', (role) => {
+	if(channel.guild)
+		return
 	if(!guilds[role.guild.id])
 		return
 	if(!guilds[role.guild.id].channel)
@@ -684,6 +692,8 @@ client.on('roleDelete', (role) => {
 });
 
 client.on('channelCreate', (channel) => {
+	if(channel.guild)
+		return
 	if(!guilds[channel.guild.id])
 		return
 	if(!guilds[channel.guild.id].channel)
@@ -704,6 +714,8 @@ client.on('channelUpdate', (oldChannel, newChannel) => {
 });
 
 client.on('channelDelete', (channel) => {
+	if(channel.guild)
+		return
 	if(!guilds[channel.guild.id])
 		return
 	if(!guilds[channel.guild.id].channel)
@@ -722,6 +734,8 @@ client.on('channelDelete', (channel) => {
 });
 
 client.on('guildMemberUpdate', (oldMember, newMember) => {
+	if(channel.guild)
+		return
 	if(!guilds[oldMember.guild.id])
 		return
 	if(!guilds[oldMember.guild.id].channel)
@@ -741,6 +755,8 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 });
 
 client.on('guildMemberRemove', (member) => {
+	if(channel.guild)
+		return
 	if(!guilds[member.guild.id])
 		return
 	if(!guilds[member.guild.id].channel)
@@ -758,6 +774,8 @@ client.on('guildMemberRemove', (member) => {
 });
 
 client.on('guildMemberAdd', (member) => {
+	if(channel.guild)
+		return
 	if(!guilds[member.guild.id])
 		return
 	if(!guilds[member.guild.id].channel)
