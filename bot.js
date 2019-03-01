@@ -581,7 +581,7 @@ client.on('messageDelete', msg => {
 		return
 	const embed = new Discord.RichEmbed()
 	.setColor(0xbb0000)
-	.setAuthor(msg.author.username, msg.author.avatarURL)
+	.setAuthor(msg.author.username, msg.author.avatarURL || msg.author.defaultAvatarURL)
 	.setTitle('Message deleted at')
 	.setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
 	.addField('Content', msg.content || '_ _')
@@ -600,7 +600,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
 		return
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff9900)
-	.setAuthor(oldMsg.author.username, oldMsg.author.avatarURL)
+	.setAuthor(oldMsg.author.username, oldMsg.author.avatarURL || oldMsg.author.defaultAvatarURL)
 	.setTitle('Message edited at')
 	.setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
 	.addField('Old content', oldMsg.content || '_ _')	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
@@ -684,9 +684,9 @@ client.on('roleDelete', (role) => {
 });
 
 client.on('channelCreate', (channel) => {
-	if(!guilds[role.guild.id])
+	if(!guilds[channel.guild.id])
 		return
-	if(!guilds[role.guild.id].channel)
+	if(!guilds[channel.guild.id].channel)
 		return
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff0000)
@@ -694,19 +694,19 @@ client.on('channelCreate', (channel) => {
 	.setDescription(`<#${channel.id}> (${channel.id})`)
 	.addField('Name', channel.name, true)
 	.setTimestamp();
-	guilds[role.guild.id].channel.send({embed});
+	guilds[channel.guild.id].channel.send({embed});
 });
 
 client.on('channelUpdate', (oldChannel, newChannel) => {
-	console.log(oldChannel.permissionOverwrites);
-	console.log(newChannel.permissionOverwrites);
-	console.log(oldChannel.permissionOverwrites.equals(newChannel.permissionOverwrites));
+//	console.log(oldChannel.permissionOverwrites);
+//	console.log(newChannel.permissionOverwrites);
+//	console.log(oldChannel.permissionOverwrites.equals(newChannel.permissionOverwrites));
 });
 
 client.on('channelDelete', (channel) => {
-	if(!guilds[role.guild.id])
+	if(!guilds[channel.guild.id])
 		return
-	if(!guilds[role.guild.id].channel)
+	if(!guilds[channel.guild.id].channel)
 		return
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff0000)
@@ -718,7 +718,7 @@ client.on('channelDelete', (channel) => {
 	.addField('@everyone permission', 'Allow: ' + channel.permissionOverwrites.get('501043184361537547').allowed +
 	'\nDenied: ' + channel.permissionOverwrites.get('501043184361537547').denied, true)
 	.setTimestamp();
-	guilds[role.guild.id].channel.send({embed});
+	guilds[channel.guild.id].channel.send({embed});
 });
 
 client.on('guildMemberUpdate', (oldMember, newMember) => {
@@ -740,6 +740,46 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 	guilds[oldMember.guild.id].channel.send({embed});
 });
 
+client.on('guildMemberRemove', (member) => {
+	if(!guilds[member.guild.id])
+		return
+	if(!guilds[member.guild.id].channel)
+		return
+	const embed = new Discord.RichEmbed()
+	.setColor(0xff0000)
+	.setTitle('Member left')
+	.setDescription(`<@${member.id}> (${member.id})`)
+	.addField('Name', member.name, true)
+	.addField('Avatar:', '_ _', false)
+	.setImage(member.user.avatarURL || member.user.defaultAvatarURL)	//Image because it might be animated
+	.setFooter(`User id: <@${member.id}>`, '')
+	.setTimestamp();
+	guilds[member.guild.id].channel.send({embed});
+});
+
+client.on('guildMemberAdd', (member) => {
+	if(!guilds[member.guild.id])
+		return
+	if(!guilds[member.guild.id].channel)
+		return
+	const embed = new Discord.RichEmbed()
+	.setColor(0xff0000)
+	.setTitle('Member joined')
+	.setDescription(`<@${member.id}> (${member.id})`)
+	.addField('Name', member.name, true)
+	.addField('Avatar:', '_ _', false)
+	.setImage(member.user.avatarURL || member.user.defaultAvatarURL)	//Image because it might be animated
+	.setFooter(`User id: <@${member.id}>`, '')
+	.setTimestamp();
+	guilds[member.guild.id].channel.send({embed});
+});
+/*
+Red 0xff0000
+Dark red 0xbb0000
+Orange 0xff9900
+Yellow 0xffff00
+Green 0x00ff00
+*/
 function check_restarted_properly(){
 	if(process.argv[2]){
 		let channel = client.channels.get(process.argv[2]);
