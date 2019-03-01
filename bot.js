@@ -1,7 +1,7 @@
 'use strict';
 const st_hd = require('./settings handler.js');
 const Discord = require('discord.js');
-const client = new Discord.Client({ disableEveryone: true, apiRequestMethod: 'burst' });
+const client = new Discord.Client({ disableEveryone: true });
 
 const guilds = {};
 const value = {};
@@ -573,7 +573,7 @@ client.on('message', async function(msg){
 });
 
 client.on('messageDelete', msg => {
-	if(channel.guild)
+	if(!msg.guild)
 		return
 	if(!guilds[msg.guild.id])
 		return
@@ -592,7 +592,7 @@ client.on('messageDelete', msg => {
 });
 
 client.on('messageUpdate', (oldMsg, newMsg) => {
-	if(channel.guild)
+	if(!oldMsg.guild)
 		return
 	if(!guilds[oldMsg.guild.id])
 		return
@@ -614,7 +614,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
 });
 
 client.on('roleCreate', role => {
-	if(channel.guild)
+	if(!role.guild)
 		return
 	if(!guilds[role.guild.id])
 		return
@@ -637,7 +637,7 @@ client.on('roleCreate', role => {
 });
 
 client.on('roleUpdate', (oldRole, newRole) => {
-	if(channel.guild)
+	if(!oldRole.guild)
 		return
 	if(!guilds[oldRole.guild.id])
 		return
@@ -669,7 +669,7 @@ client.on('roleUpdate', (oldRole, newRole) => {
 });
 
 client.on('roleDelete', (role) => {
-	if(channel.guild)
+	if(!role.guild)
 		return
 	if(!guilds[role.guild.id])
 		return
@@ -692,7 +692,7 @@ client.on('roleDelete', (role) => {
 });
 
 client.on('channelCreate', (channel) => {
-	if(channel.guild)
+	if(!channel.guild)
 		return
 	if(!guilds[channel.guild.id])
 		return
@@ -714,7 +714,7 @@ client.on('channelUpdate', (oldChannel, newChannel) => {
 });
 
 client.on('channelDelete', (channel) => {
-	if(channel.guild)
+	if(!channel.guild)
 		return
 	if(!guilds[channel.guild.id])
 		return
@@ -734,7 +734,7 @@ client.on('channelDelete', (channel) => {
 });
 
 client.on('guildMemberUpdate', (oldMember, newMember) => {
-	if(channel.guild)
+	if(!oldMember.guild)
 		return
 	if(!guilds[oldMember.guild.id])
 		return
@@ -755,7 +755,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 });
 
 client.on('guildMemberRemove', (member) => {
-	if(channel.guild)
+	if(!member.guild)
 		return
 	if(!guilds[member.guild.id])
 		return
@@ -774,7 +774,7 @@ client.on('guildMemberRemove', (member) => {
 });
 
 client.on('guildMemberAdd', (member) => {
-	if(channel.guild)
+	if(!member.guild)
 		return
 	if(!guilds[member.guild.id])
 		return
