@@ -90,7 +90,7 @@ client.on('message', async function(msg){
 	let invites = msg.content.match(/discord.gg\/\S+/g);
 	if(invites){
 		invites.forEach(invite => {
-			client.fetchInvites(invite)
+			client.fetchInvite(invite)
 			.then(invite => {
 				if(!msg.guild)
 					return
