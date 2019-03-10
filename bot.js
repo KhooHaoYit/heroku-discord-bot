@@ -102,7 +102,7 @@ client.on('message', async function(msg){
 				.setColor(0x1177aa)
 				.setTitle('Invite information')
 				.setDescription(invite.url)
-				.setThumbnail(invite.guild.icon);
+				.setThumbnail(invite.guild.icon)
 				.addField('Server\'s name', invite.guild.name, true)
 				.addField('${invite.channel.type} channel\'s name', `<#${invite.channel.id}> (#${invite.channel.name})`, true)
 				.addField('Link to message', msg.url, true)
@@ -651,6 +651,7 @@ client.on('message', async function(msg){
 });
 
 client.on('messageDelete', msg => {
+	//TODO: Log pinned message properly (And probably other type of message too)
 	if(!msg.guild)
 		return
 	if(!guilds[msg.guild.id])
