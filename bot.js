@@ -87,12 +87,91 @@ client.on('ready', async () => {
 });
 
 client.on('message', async function(msg){
+	let invites = msg.content.match(/discord.gg\/\S+/g);
+	if(invites){
+		invites.forEach(invite => {
+			client.fetchInvites(invite)
+			.then(invite => {
+				if(!msg.guild)
+					return
+				if(!guilds[msg.guild.id])
+					return
+				if(!guilds[msg.guild.id].channel)
+					return
+				let embed = new Discord.RichEmbed()
+				.setColor(0x1177aa)
+				.setTitle('Invite information')
+				.setDescription(invite.url)
+				.setThumbnail(invite.guild.icon);
+				.addField('Server\'s name', invite.guild.name, true)
+				.addField('${invite.channel.type} channel\'s name', `<#${invite.channel.id}> (#${invite.channel.name})`, true)
+				.addField('Link to message', msg.url, true)
+				.setTimestamp();
+				if(invite.inviter) embed.addField('Invite creator', `<@${invite.inviter.id}> (@${invite.inviter.tag})`, true);
+				//TODO: Add other information
+				embed.addField('Invite creator', invite.inviter, true)
+				guilds[msg.guild.id].channel.send({embed});
+			})
+			.catch();
+		});
+	}
 	if (/^<@!?278157010233589764>/.test(msg.content) && msg.author.id == '278157010233589764' ||
 	/^<@!?259066297109839872>/.test(msg.content) && msg.author.id == '259066297109839872') {
 		var args = msg.content.split(' ');
 		if(RegExp(`<@!?${client.user.id}>`).test(args[1])){
 			args = args.splice(2);
 			switch (args[0]) {
+				case 'test':
+					let command = args.splice(1).join(' ').split('```');
+					if(!(command[0] || command[command.length - 1])){
+						command.shift();
+						command.pop();
+						command = command.join('```');
+						if(command.substr(0, 11).toLowerCase() == 'javascript\n'){
+							command = command.substr(11);
+						}
+						else if(command.substr(0, 3).toLowerCase() == 'js\n'){
+							command = command.substr(3);
+						}
+					}
+					else{
+						command = command.join('```');
+					}
+					const child = require('child_process').spawn('node', ['Custom Command API.js', command], { stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });
+					child.on('message', (message) => {
+						switch(message.data){
+							case 'MessageContent':
+								child.send({ data: msg.content, id: message.id })
+								break;
+							case 'MessageId':
+								child.send({ data: msg.id, id: message.id });
+								break;
+							default:
+						}
+					});
+					let output = { stdout: '', stderr: '' };
+					child.stdout.on('data', data => output.stdout += data);
+					child.stderr.on('data', data => output.stderr += data);
+					child.on('exit', code => {
+						if(output.stdout.length){
+							msg.channel.send(new Discord.RichEmbed()
+							.setTitle('Stdout:')
+							.setTimestamp(msg.createdAt)
+							.setDescription(('```js\n' + output.stdout).substr(0, 2044) + '\n```'));
+						}
+						if(output.stderr.length){
+							msg.channel.send(new Discord.RichEmbed()
+							.setTitle('Stderr:')
+							.setTimestamp(msg.createdAt)
+							.setDescription(('```js\n' + output.stderr).substr(0, 2044) + '\n```'));
+						}
+					});
+					child.on('error', code => console.log(`Child produced error: ${code}`));
+					setTimeout(function(){
+						child.kill();
+						output.stderr += 'Error: ETIMEDOUT (Manual kill)';
+					}, 10000);
+					break;
 				case 'async_function':
 					{
 						let command = args.splice(1).join(' ').split('```');
@@ -222,11 +301,9 @@ client.on('message', async function(msg){
 						}
 					}
 					msg.channel.send('Restarting....').then(() => {
-						//msg.delete();
 						client.destroy().then(() => {
 							process.send(msg.channel.id);
 							process.exit();
-							//throw 'Restarting....';
 						});
 					});
 					break;
@@ -293,6 +370,7 @@ client.on('message', async function(msg){
 				break;
 			}case 'set':
 				if (!msg.member.permissions.has('ADMINISTRATOR'))
+					//Send message that you don't have permission
 					return;
 				switch (args[1]) {
 					case 'prefix':
@@ -741,7 +819,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 	if(!guilds[oldMember.guild.id].channel)
 		return
 	const embed = new Discord.RichEmbed()
-	.setColor(0xff0000)
+	.setColor(0xffff00)
 	.setTitle('Member updated')
 	.setDescription(`<@${oldMember.id}> (${oldMember.id})`)
 	.setTimestamp();
@@ -764,11 +842,8 @@ client.on('guildMemberRemove', (member) => {
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff0000)
 	.setTitle('Member left')
-	.setDescription(`<@${member.id}> (${member.id})`)
-	.addField('Name', member.name, true)
-	.addField('Avatar:', '_ _', false)
-	.setImage(member.user.avatarURL || member.user.defaultAvatarURL)	//Image because it might be animated
-	.setFooter(`User id: <@${member.id}>`, '')
+	.setDescription(`<@${member.id}> ${member.id} ${member.user.tag}`)
+	.setThumbnail(member.user.avatarURL || member.user.defaultAvatarURL)
 	.setTimestamp();
 	guilds[member.guild.id].channel.send({embed});
 });
@@ -781,13 +856,10 @@ client.on('guildMemberAdd', (member) => {
 	if(!guilds[member.guild.id].channel)
 		return
 	const embed = new Discord.RichEmbed()
-	.setColor(0xff0000)
+	.setColor(0x00ff00)
 	.setTitle('Member joined')
-	.setDescription(`<@${member.id}> (${member.id})`)
-	.addField('Name', member.name, true)
-	.addField('Avatar:', '_ _', false)
-	.setImage(member.user.avatarURL || member.user.defaultAvatarURL)	//Image because it might be animated
-	.setFooter(`User id: <@${member.id}>`, '')
+	.setDescription(`<@${member.id}> ${member.id} ${member.user.tag}`)
+	.setThumbnail(member.user.avatarURL || member.user.defaultAvatarURL)
 	.setTimestamp();
 	guilds[member.guild.id].channel.send({embed});
 });
@@ -797,7 +869,11 @@ Dark red 0xbb0000
 Orange 0xff9900
 Yellow 0xffff00
 Green 0x00ff00
+Light Blue 0xaddff
+Blue 0x1177aa
 */
+client.on('error', console.log);
+
 function check_restarted_properly(){
 	if(process.argv[2]){
 		let channel = client.channels.get(process.argv[2]);
