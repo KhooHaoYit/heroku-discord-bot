@@ -98,17 +98,17 @@ client.on('message', async function(msg){
 					return
 				if(!guilds[msg.guild.id].channel)
 					return
-				let embed = new Discord.RichEmbed()
+				const embed = new Discord.RichEmbed()
 				.setColor(0x1177aa)
 				.setTitle('Invite information')
 				.setDescription(invite.url)
+				.setThumbnail(`https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}`)
 				.addField('Server\'s name', invite.guild.name, true)
 				.addField(`${invite.channel.type[0].toUpperCase() + invite.channel.type.slice(1)} channel's name`, `<#${invite.channel.id}> (#${invite.channel.name})`, true)	//TODO: Make a function that uppercase first letter
-				.addField('Link to message', msg.url, true)
 				.setTimestamp();
 				if(invite.inviter) embed.addField('Invite creator', `<@${invite.inviter.id}> (@${invite.inviter.tag})`, true);
 				//TODO: Add other information
-				embed.setThumbnail(`https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}`);
+				embed.addField('Link to message', msg.url, true);
 				guilds[msg.guild.id].channel.send({embed});
 			})
 			.catch();
