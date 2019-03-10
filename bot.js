@@ -102,7 +102,7 @@ client.on('message', async function(msg){
 				.setColor(0x1177aa)
 				.setTitle('Invite information')
 				.setDescription(invite.url)
-				.setThumbnail(invite.guild.icon)
+				.setThumbnail(`https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}`)
 				.addField('Server\'s name', invite.guild.name, true)
 				.addField('${invite.channel.type} channel\'s name', `<#${invite.channel.id}> (#${invite.channel.name})`, true)
 				.addField('Link to message', msg.url, true)
