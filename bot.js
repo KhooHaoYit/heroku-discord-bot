@@ -63,6 +63,9 @@ client.on('ready', async () => {
 								console.log(`${guild.name}'s settings is loaded.`);
 							}
 							break;
+						case 'settings':
+							eval(args.slice(1).join(' '));
+							break;
 						default:
 							break;
 					}
