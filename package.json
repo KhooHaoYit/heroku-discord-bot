@@ -4,7 +4,10 @@
   "description": "backup bot",
   "main": "app.js",
   "author": {
-    "name": ""
+    "name": "Khoo Hao Yit"
+  },
+  "scripts": {
+    "start": "node web.js"
   },
   "dependencies": {
     "bufferutil": "^3.0.3",
