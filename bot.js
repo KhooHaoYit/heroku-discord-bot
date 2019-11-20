@@ -86,6 +86,17 @@ client.on('ready', async () => {
 				}
 			});
 		}
+        else{
+			guilds[guild.id] = {
+				remote: {
+					space: true,
+					prefix: `<@${client.user.id}>`
+				},
+				settingsLocation: null,
+				channel: null
+			};
+			console.log(`Channel not found, ${guild.name}'s settings is set to default.`);
+        }
 	});
 });
 
