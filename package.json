@@ -10,8 +10,8 @@
     "start": "node web.js"
   },
   "engines": {
-    "node": ">=12.5.0",
-    "npm": ">=6.13.0"
+    "node": "^11.14.0",
+    "npm": "^6.13.0"
   },
   "dependencies": {
     "bufferutil": "^3.0.3",
