@@ -1,2 +1,2 @@
-worker: node app.js
+worker: node --expose-gc app.js
 web: npm start
