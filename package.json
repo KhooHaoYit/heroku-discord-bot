@@ -16,11 +16,16 @@
   "dependencies": {
     "@discordjs/opus": "^0.1.0",
     "@discordjs/uws": "^10.149.0",
+    "bufferutil": "^4.0.1",
     "discord.js": "^11.5.1",
     "discord.js.master": "git+https://github.com/discordjs/discord.js.git",
+    "erlpack": "github:discordapp/erlpack",
     "ffmpeg-static": "^4.0.0",
     "jimp": "^0.9.3",
     "node-fetch": "^2.6.0",
-    "ytdl-core": "^1.0.7"
+    "sodium": "^3.0.2",
+    "utf-8-validate": "^5.0.2",
+    "ytdl-core": "^1.0.7",
+    "zlib-sync": "^0.1.6"
   }
 }
