@@ -16,6 +16,7 @@
   "dependencies": {
     "@discordjs/uws": "^10.149.0",
     "discord.js": "^11.5.1",
+    "discord.js.master": "git+https://github.com/discordjs/discord.js.git",
     "ffmpeg-static": "^4.0.0",
     "jimp": "^0.9.3",
     "node-fetch": "^2.6.0",
