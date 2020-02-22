@@ -898,7 +898,7 @@ function check_restarted_properly(){
 }
 
 function LoginUsingFile(){
-	console.log('Logging using file....')
+	console.log('Logging using file....');
 	try{
 		client.login(require('./auth.json').token).then(check_restarted_properly);
 	}catch(e){
