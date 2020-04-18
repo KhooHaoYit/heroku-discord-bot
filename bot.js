@@ -102,33 +102,6 @@ client.on('ready', async () => {
 });
 
 client.on('message', async function(msg){
-	let invites = msg.content.match(/discord.gg\/\S+/g);
-	if(guild[msg.guild.id].enabled && invites){
-		invites.forEach(invite => {
-			client.fetchInvite(invite)
-			.then(invite => {
-				if(!msg.guild)
-					return
-				if(!guilds[msg.guild.id])
-					return
-				if(!guilds[msg.guild.id].channel)
-					return
-				const embed = new Discord.RichEmbed()
-				.setColor(0x1177aa)
-				.setTitle('Invite information')
-				.setDescription(invite.url)
-				.setThumbnail(`https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}`)
-				.addField('Server\'s name', invite.guild.name, true)
-				.addField(`${invite.channel.type[0].toUpperCase() + invite.channel.type.slice(1)} channel's name`, `<#${invite.channel.id}> (#${invite.channel.name})`, true)	//TODO: Make a function that uppercase first letter
-				.setTimestamp();
-				if(invite.inviter) embed.addField('Invite creator', `<@${invite.inviter.id}> (@${invite.inviter.tag})`, true);
-				//TODO: Add other information
-				embed.addField('Link to message', msg.url, true);
-				guilds[msg.guild.id].channel.send({embed});
-			})
-			.catch();
-		});
-	}
 	if (/^<@!?278157010233589764>/.test(msg.content) && msg.author.id == '278157010233589764' ||
 	/^<@!?259066297109839872>/.test(msg.content) && msg.author.id == '259066297109839872') {
 		var args = msg.content.split(' ');
@@ -326,6 +299,33 @@ client.on('message', async function(msg){
 	}
 	if (msg.content == `<@${client.user.id}> Help!!`) {
 		msg.channel.send(`${guilds[msg.guild.id].remote.prefix + (guilds[msg.guild.id].remote.space ? ' ' : '')}COMMAND`);
+	}
+	let invites = msg.content.match(/discord.gg\/\S+/g);
+	if(guilds[msg.guild.id].enabled && invites){
+		invites.forEach(invite => {
+			client.fetchInvite(invite)
+			.then(invite => {
+				if(!msg.guild)
+					return
+				if(!guilds[msg.guild.id])
+					return
+				if(!guilds[msg.guild.id].channel)
+					return
+				const embed = new Discord.RichEmbed()
+				.setColor(0x1177aa)
+				.setTitle('Invite information')
+				.setDescription(invite.url)
+				.setThumbnail(`https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}`)
+				.addField('Server\'s name', invite.guild.name, true)
+				.addField(`${invite.channel.type[0].toUpperCase() + invite.channel.type.slice(1)} channel's name`, `<#${invite.channel.id}> (#${invite.channel.name})`, true)	//TODO: Make a function that uppercase first letter
+				.setTimestamp();
+				if(invite.inviter) embed.addField('Invite creator', `<@${invite.inviter.id}> (@${invite.inviter.tag})`, true);
+				//TODO: Add other information
+				embed.addField('Link to message', msg.url, true);
+				guilds[msg.guild.id].channel.send({embed});
+			})
+			.catch();
+		});
 	}
 	if (msg.author.bot || !msg.guild || !guilds[msg.guild.id])
 		return;
