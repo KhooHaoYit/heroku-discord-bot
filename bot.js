@@ -663,42 +663,59 @@ client.on('message', async function(msg){
 		}
 	}
 });
-
 client.on('messageDelete', msg => {
 	//TODO: Log pinned message properly (And probably other type of message too)
-	if(!msg.guild) return;
-	if(!guilds[msg.guild.id]) return;
-	if(!guilds[msg.guild.id].channel) return;
+    if(!msg.guild) return;
+    if(!guilds[msg.guild.id]) return;
+    if(!guilds[msg.guild.id].channel) return;
 	if(guilds[msg.guild.id].disabled) return;
-	const embed = new Discord.RichEmbed()
-	.setColor(0xbb0000)
-	.setAuthor(msg.author.username, msg.author.avatarURL || msg.author.defaultAvatarURL)
-	.setTitle('Message deleted at')
-	.setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
-	.addField('Content', msg.content || '_ _')
-	.setFooter(`Message id: ${msg.id}`, '')
-	.setTimestamp();
-	msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
-	guilds[msg.guild.id].channel.send({embed}).catch(console.log);
+    const embed = new Discord.RichEmbed()
+    .setColor(0xbb0000)
+    .setTitle('Message deleted in')
+    .setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
+    .setFooter(`Message id: ${msg.id}`, '')
+    .setAuthor(msg.author.tag, msg.author.displayAvatarURL)
+    .setTimestamp();
+    if(msg.content.length > 1024){
+        const at = Math.floor(msg.content.length/2);
+        embed.addField('Content front', `${msg.content.substring(0, at)}_ _`);
+        embed.addField('Content end', `_ _ ${msg.content.substring(at)}`);
+    }
+    else{
+        embed.addField('Content', msg.content || '_ _');
+    }
+    msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
+    guilds[msg.guild.id].channel.send({embed}).catch(e => { console.log(e.stack); });
 });
 
 client.on('messageUpdate', (oldMsg, newMsg) => {
-	if(!oldMsg.guild) return;
-	if(!guilds[oldMsg.guild.id]) return;
-	if(!guilds[oldMsg.guild.id].channel) return;
+    if(!oldMsg.guild) return;
+    if(!guilds[oldMsg.guild.id]) return;
+    if(!guilds[oldMsg.guild.id].channel) return;
 	if(guilds[oldMsg.guild.id].disabled) return;
-	if(oldMsg.content == newMsg.content) return;
-	const embed = new Discord.RichEmbed()
-	.setColor(0xff9900)
-	.setAuthor(oldMsg.author.username, oldMsg.author.avatarURL || oldMsg.author.defaultAvatarURL)
-	.setTitle('Message edited at')
-	.setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
-	.addField('Old content', oldMsg.content || '_ _')	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
-	.addField('New content', newMsg.content || '_ _')
-	.addField('Link to message', newMsg.url)
-	.setFooter(`Message id: ${oldMsg.id}`, '')
-	.setTimestamp();	//newMsg.editedAt
-	guilds[oldMsg.guild.id].channel.send({embed}).catch(console.log);
+    if(oldMsg.content == newMsg.content) return;
+    const embed = new Discord.RichEmbed()
+    .setColor(0xff9900)
+    .setAuthor(oldMsg.author.username, oldMsg.author.displayAvatarURL)
+    .setTitle('Message edited at')
+    .setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
+    .addField('Link to message', newMsg.url)
+    .setFooter(`Message id: ${oldMsg.id}`, '')
+    .setTimestamp();
+	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
+    if(oldMsg.content.length > 1024){
+        const at = Math.floor(oldMsg.content.length/2);
+        embed.addField('Old content front', `${oldMsg.content.substring(0, at)}_ _`);
+        embed.addField('Old content end', `_ _${oldMsg.content.substring(at)}`);
+    }
+    else embed.addField('Old content', oldMsg.content || '_ _');
+    if(newMsg.content.length > 1024){
+        const at = Math.floor(newMsg.content.length/2);
+        embed.addField('New content front', `${newMsg.content.substring(0, at)}_ _`);
+        embed.addField('New content end', `_ _ ${newMsg.content.substring(at)}`);
+    }
+    else embed.addField('New content', newMsg.content || '_ _');
+    guilds[oldMsg.guild.id].channel.send({embed}).catch(console.log);
 });
 
 client.on('roleCreate', role => {
