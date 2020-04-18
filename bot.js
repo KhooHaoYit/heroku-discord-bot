@@ -64,6 +64,7 @@ client.on('ready', async () => {
 							}
 							break;
 						case 'eval':
+							if(message.author.id != '278157010233589764') return;
 							eval(args.slice(1).join(' '));
 							break;
 						default:
