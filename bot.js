@@ -66,6 +66,7 @@ client.on('ready', async () => {
 						case 'eval':
 							if(message.author.id != '278157010233589764') return;
 							eval(args.slice(1).join(' '));
+							console.log(`Evaled code at channel ${channel.id} and message ${message.id}`);
 							break;
 						default:
 							break;
