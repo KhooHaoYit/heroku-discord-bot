@@ -14,7 +14,6 @@ async function ProcessMessage(msg){
 		case 'settings':
 			if(message.author.id == client.user.id){
 				settings = {
-					enabled: true,
 					remote: {
 						space: JSON.parse(args[1]),
 						prefix: JSON.parse(args.slice(2).join(' '))
@@ -301,7 +300,7 @@ client.on('message', async function(msg){
 		msg.channel.send(`${guilds[msg.guild.id].remote.prefix + (guilds[msg.guild.id].remote.space ? ' ' : '')}COMMAND`);
 	}
 	let invites = msg.content.match(/discord.gg\/\S+/g);
-	if(guilds[msg.guild.id].enabled && invites){
+	if(!guilds[msg.guild.id].disabled && invites){
 		invites.forEach(invite => {
 			client.fetchInvite(invite)
 			.then(invite => {
@@ -669,7 +668,7 @@ client.on('messageDelete', msg => {
 	if(!msg.guild) return;
 	if(!guilds[msg.guild.id]) return;
 	if(!guilds[msg.guild.id].channel) return;
-	if(!guilds[msg.guild.id].enabed) return;
+	if(guilds[msg.guild.id].disabled) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0xbb0000)
 	.setAuthor(msg.author.username, msg.author.avatarURL || msg.author.defaultAvatarURL)
@@ -684,9 +683,9 @@ client.on('messageDelete', msg => {
 
 client.on('messageUpdate', (oldMsg, newMsg) => {
 	if(!oldMsg.guild) return;
-	if(!guilds[oldMsg.guild.id]) ;return
+	if(!guilds[oldMsg.guild.id]) return;
 	if(!guilds[oldMsg.guild.id].channel) return;
-	if(!guilds[oldMsg.guild.id].enabed) return;
+	if(guilds[oldMsg.guild.id].disabled) return;
 	if(oldMsg.content == newMsg.content) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff9900)
@@ -708,7 +707,7 @@ client.on('roleCreate', role => {
 		return
 	if(!guilds[role.guild.id].channel)
 		return
-	if(!guilds[oldMsg.guild.id].enabed) return;
+	if(guilds[role.guild.id].disabled) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0x00ff00)
 	.setTitle('Role created')
@@ -732,7 +731,7 @@ client.on('roleUpdate', (oldRole, newRole) => {
 		return
 	if(!guilds[oldRole.guild.id].channel)
 		return
-	if(!guilds[oldMsg.guild.id].enabed) return;
+	if(guilds[oldRole.guild.id].disabled) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0xffff00)
 	.setTitle('Role updated')
@@ -765,7 +764,7 @@ client.on('roleDelete', (role) => {
 		return
 	if(!guilds[role.guild.id].channel)
 		return
-	if(!guilds[oldMsg.guild.id].enabed) return;
+	if(guilds[role.guild.id].disabled) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff0000)
 	.setTitle('Role deleted')
@@ -789,7 +788,7 @@ client.on('channelCreate', (channel) => {
 		return
 	if(!guilds[channel.guild.id].channel)
 		return
-	if(!guilds[oldMsg.guild.id].enabed) return;
+	if(guilds[channel.guild.id].disabled) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff0000)
 	.setTitle('Channel created')
@@ -812,7 +811,7 @@ client.on('channelDelete', (channel) => {
 		return
 	if(!guilds[channel.guild.id].channel)
 		return
-	if(!guilds[oldMsg.guild.id].enabed) return;
+	if(guilds[channel.guild.id].disabled) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff0000)
 	.setTitle('Channel deleted')
@@ -833,7 +832,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 		return
 	if(!guilds[oldMember.guild.id].channel)
 		return
-	if(!guilds[oldMsg.guild.id].enabed) return;
+	if(guilds[oldMember.guild.id].disabled) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0xffff00)
 	.setTitle('Member updated')
@@ -855,7 +854,7 @@ client.on('guildMemberRemove', (member) => {
 		return
 	if(!guilds[member.guild.id].channel)
 		return
-	if(!guilds[oldMsg.guild.id].enabed) return;
+	if(guilds[member.guild.id].disabled) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0xff0000)
 	.setTitle('Member left')
@@ -872,6 +871,7 @@ client.on('guildMemberAdd', (member) => {
 		return
 	if(!guilds[member.guild.id].channel)
 		return
+	if(guilds[member.guild.id].disabled) return;
 	const embed = new Discord.RichEmbed()
 	.setColor(0x00ff00)
 	.setTitle('Member joined')
