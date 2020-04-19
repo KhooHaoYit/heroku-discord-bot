@@ -21,6 +21,7 @@
     "discord.js.master": "git+https://github.com/discordjs/discord.js.git",
     "erlpack": "github:discordapp/erlpack",
     "ffmpeg-static": "^4.0.0",
+    "google-spreadsheet": "^3.0.11",
     "jimp": "^0.9.3",
     "node-fetch": "^2.6.0",
     "node-html-parser": "^1.2.16",
