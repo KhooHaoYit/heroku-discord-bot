@@ -16,6 +16,7 @@
   "dependencies": {
     "@discordjs/opus": "^0.1.0",
     "@discordjs/uws": "^10.149.0",
+    "base32768": "^2.0.0",
     "bufferutil": "^4.0.1",
     "discord.js": "^11.5.1",
     "discord.js.master": "git+https://github.com/discordjs/discord.js.git",
@@ -27,7 +28,6 @@
     "node-html-parser": "^1.2.16",
     "node-osu": "^2.2.0",
     "sodium": "^3.0.2",
-    "tor-request": "^3.1.0",
     "utf-8-validate": "^5.0.2",
     "ytdl-core": "^1.0.7",
     "zlib-sync": "^0.1.6"
