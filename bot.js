@@ -37,7 +37,7 @@ async function ProcessMessage(msg){
 	guilds[guild.id] = settings;
 }
 
-client.on('ready', async () => {
+client.once('ready', async () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	client.guilds.forEach(async guild => {
 		let channel = guild.channels.find(channel => channel.name == 'backup-bot');
