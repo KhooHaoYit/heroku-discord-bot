@@ -666,14 +666,49 @@ client.on('message', async function(msg){
 });
 client.on('messageDelete', msg => {
 	//TODO: Log pinned message properly (And probably other type of message too)
-    if(!msg.guild) return;
-    if(!guilds[msg.guild.id]) return;
-    if(!guilds[msg.guild.id].channel) return;
+  if(!msg.guild) return;
+  if(!guilds[msg.guild.id]) return;
+  if(!guilds[msg.guild.id].channel) return;
 	if(guilds[msg.guild.id].disabled) return;
+  const embed = new Discord.RichEmbed()
+  .setColor(0xbb0000)
+  .setTitle('Message deleted in')
+  .setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
+  .setFooter(`Message id: ${msg.id}`, '')
+  .setAuthor(msg.author.tag, msg.author.displayAvatarURL)
+  .setTimestamp();
+  if(msg.content.length > 1024){
+      const at = Math.floor(msg.content.length/2);
+      embed.addField('Content front', `${msg.content.substring(0, at)}_ _`);
+      embed.addField('Content end', `_ _ ${msg.content.substring(at)}`);
+  }
+  else{
+      embed.addField('Content', msg.content || '_ _');
+  }
+  msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
+  guilds[msg.guild.id].channel.send({embed}).catch(e => { console.log(e.stack); });
+});
+
+client.on('messageDeleteBulk', async msgs => {
+  const firstMsg = msgs.first();
+  if(!firstMsg.guild) return;
+  const guildId = firstMsg.guild.id;
+  if(!guilds[guildId]) return;
+  if(!guilds[guildId].channel) return;
+  if(guilds[guildId].disabled) return;
+  msgs = Array.from(msgs.values());
+  for(const index in msgs){
+    const msg = msgs[index];
+    //TODO: Log pinned message properly (And probably other type of message too)
     const embed = new Discord.RichEmbed()
     .setColor(0xbb0000)
     .setTitle('Message deleted in')
-    .setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
+    .setDescription(`\
+<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\`
+> Bulk delete
+First message id: ${firstMsg.id}
+Current index: ${Number(index) + 1}/${msgs.length}\
+`)
     .setFooter(`Message id: ${msg.id}`, '')
     .setAuthor(msg.author.tag, msg.author.displayAvatarURL)
     .setTimestamp();
@@ -686,7 +721,8 @@ client.on('messageDelete', msg => {
         embed.addField('Content', msg.content || '_ _');
     }
     msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
-    guilds[msg.guild.id].channel.send({embed}).catch(e => { console.log(e.stack); });
+    await guilds[msg.guild.id].channel.send({embed}).catch(e => { console.log(e.stack); });
+  }
 });
 
 client.on('messageUpdate', (oldMsg, newMsg) => {
