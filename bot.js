@@ -420,7 +420,7 @@ client.on('message', async function(msg){
 								},
 								timestamp: msg.createdAt,
 								footer: {
-									icon_url: msg.author.avatarURL,
+									icon_url: msg.author.displayAvatarURL({ size: 32 }),
 									text: msg.author.username
 								}
 							}
@@ -450,7 +450,7 @@ client.on('message', async function(msg){
 						msg.channel.send(new Discord.MessageEmbed()
 							.setColor('RANDOM')
 							.setDescription(output)
-							.setFooter(msg.author.username, msg.author.avatarURL)
+							.setFooter(msg.author.username, msg.author.displayAvatarURL({ size: 32 }))
 							.setTimestamp(msg.createdAt)
 						);
 						break;
@@ -467,7 +467,7 @@ client.on('message', async function(msg){
 						.addField('Permissions', role.permissions, true)
 						.addField('Managed', role.managed, true)
 						.addField('Mentionable', role.mentionable, true)
-						.setFooter(msg.author.username, msg.author.avatarURL)
+						.setFooter(msg.author.username, msg.author.displayAvatarURL({ size: 32 }))
 						.setTimestamp(msg.createdAt);
 						msg.channel.send({embed});
 						break;
@@ -477,7 +477,7 @@ client.on('message', async function(msg){
 								color: Math.floor(Math.random() * 0x1000000),
 								timestamp: Discord.SnowflakeUtil.deconstruct(args[2]).date,
 								footer: {
-									icon_url: msg.author.avatarURL,
+									icon_url: msg.author.displayAvatarURL({ size: 32 }),
 									text: msg.author.username
 								}
 							}
@@ -489,16 +489,16 @@ client.on('message', async function(msg){
 							embed: {
 								color: Math.floor(Math.random() * 0x1000000),
 								author: {
-									icon_url: user.avatarURL,
-									url: user.avatarURL,
+									icon_url: user.displayAvatarURL({ size: 32 }),
+									url: user.displayAvatarURL({ size: 32 }),
 									name: user.username
 								},
 								image: {
-									url: user.displayAvatarURL
+									url: user.displayAvatarURL({ size: 2048 })
 								},
 								timestamp: msg.createdAt,
 								footer: {
-									icon_url: msg.author.avatarURL,
+									icon_url: msg.author.displayAvatarURL({ size: 32 }),
 									text: msg.author.username
 								}
 							}
@@ -525,7 +525,7 @@ client.on('message', async function(msg){
 								embed: {
 									color: Math.floor(Math.random() * 0x1000000),
 									author: {
-										icon_url: message.author.avatarURL,
+										icon_url: message.author.displayAvatarURL({ size: 32 }),
 										url: message.url,
 										name: message.author.username
 									},
@@ -534,7 +534,7 @@ client.on('message', async function(msg){
 									image: message.attachments.first(),
 									timestamp: msg.createdAt,
 									footer: {
-										icon_url: msg.author.avatarURL,
+										icon_url: msg.author.displayAvatarURL({ size: 32 }),
 										text: msg.author.username
 									}
 								}
@@ -550,7 +550,7 @@ client.on('message', async function(msg){
 								description: `<#${channel.id}> (${channel.id})`,
 								timestamp: msg.createdAt,
 								footer: {
-									icon_url: msg.author.avatarURL,
+									icon_url: msg.author.displayAvatarURL({ size: 32 }),
 									text: msg.author.username
 								}
 							}
@@ -567,7 +567,7 @@ client.on('message', async function(msg){
 										embed: {
 											color: Math.floor(Math.random() * 0x1000000),
 											author: {
-												icon_url: message.author.avatarURL,
+												icon_url: message.author.displayAvatarURL({ size: 32 }),
 												url: message.url,
 												name: message.author.username
 											},
@@ -576,7 +576,7 @@ client.on('message', async function(msg){
 											image: message.attachments.first(),
 											timestamp: msg.createdAt,
 											footer: {
-												icon_url: msg.author.avatarURL,
+												icon_url: msg.author.displayAvatarURL({ size: 32 }),
 												text: msg.author.username
 											}
 										}
@@ -594,7 +594,7 @@ client.on('message', async function(msg){
 										},
 										timestamp: msg.createdAt,
 										footer: {
-											icon_url: msg.author.avatarURL,
+											icon_url: msg.author.displayAvatarURL({ size: 32 }),
 											text: msg.author.username
 										}
 									}
@@ -615,7 +615,7 @@ client.on('message', async function(msg){
 					.setColor('RANDOM')
 					.setTitle('Uptime:')
 					.setDescription(`${client.uptime/1000/60}m`)
-					.setFooter(msg.author.username, msg.author.avatarURL)
+					.setFooter(msg.author.username, msg.author.displayAvatarURL({ size: 32 }))
 					.setTimestamp(msg.createdAt));
 				break;
 			case 'ping':
@@ -623,14 +623,14 @@ client.on('message', async function(msg){
 					embed: {
 						color: Math.floor(Math.random() * 0x1000000),
 						author: {
-							icon_url: client.user.avatarURL,
-							url: client.user.avatarURL,
+							icon_url: client.user.displayAvatarURL({ size: 32 }),
+							url: client.user.displayAvatarURL({ size: 32 }),
 							name: client.user.username
 						},
 						description: `Pong!!\n${Math.round(client.ping)}ms`,
 						timestamp: msg.createdAt,
 						footer: {
-							icon_url: msg.author.avatarURL,
+							icon_url: msg.author.displayAvatarURL({ size: 32 }),
 							text: msg.author.username
 						}
 					}
@@ -652,7 +652,7 @@ client.on('message', async function(msg){
 						},
 						timestamp: msg.createdAt,
 						footer: {
-							icon_url: msg.author.avatarURL,
+							icon_url: msg.author.displayAvatarURL({ size: 32 }),
 							text: msg.author.username
 						}
 					}
@@ -675,7 +675,7 @@ client.on('messageDelete', msg => {
   .setTitle('Message deleted in')
   .setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
   .setFooter(`Message id: ${msg.id}`, '')
-  .setAuthor(msg.author.tag, msg.author.displayAvatarURL)
+  .setAuthor(msg.author.tag, msg.author.displayAvatarURL({ size: 32 }))
   .setTimestamp();
   if(msg.content.length > 1024){
       const at = Math.floor(msg.content.length/2);
@@ -710,7 +710,7 @@ First message id: ${firstMsg.id}
 Current index: ${Number(index) + 1}/${msgs.length}\
 `)
     .setFooter(`Message id: ${msg.id}`, '')
-    .setAuthor(msg.author.tag, msg.author.displayAvatarURL)
+    .setAuthor(msg.author.tag, msg.author.displayAvatarURL({ size: 32 }))
     .setTimestamp();
     if(msg.content.length > 1024){
         const at = Math.floor(msg.content.length/2);
@@ -733,7 +733,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
     if(oldMsg.content == newMsg.content) return;
     const embed = new Discord.MessageEmbed()
     .setColor(0xff9900)
-    .setAuthor(oldMsg.author.username, oldMsg.author.displayAvatarURL)
+    .setAuthor(oldMsg.author.username, oldMsg.author.displayAvatarURL({ size: 32 }))
     .setTitle('Message edited at')
     .setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
     .addField('Link to message', newMsg.url)
@@ -914,7 +914,7 @@ client.on('guildMemberRemove', (member) => {
 	.setColor(0xff0000)
 	.setTitle('Member left')
 	.setDescription(`<@${member.id}> ${member.id} ${member.user.tag}`)
-	.setThumbnail(member.user.avatarURL || member.user.defaultAvatarURL)
+	.setThumbnail(member.user.displayAvatarURL({ size: 2048 }))
 	.setTimestamp();
 	guilds[member.guild.id].channel.send({embed});
 });
@@ -931,7 +931,7 @@ client.on('guildMemberAdd', (member) => {
 	.setColor(0x00ff00)
 	.setTitle('Member joined')
 	.setDescription(`<@${member.id}> ${member.id} ${member.user.tag}`)
-	.setThumbnail(member.user.avatarURL || member.user.defaultAvatarURL)
+	.setThumbnail(member.user.displayAvatarURL({ size: 2048 }))
 	.setTimestamp();
 	guilds[member.guild.id].channel.send({embed});
 });
