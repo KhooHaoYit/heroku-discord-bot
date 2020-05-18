@@ -38,73 +38,74 @@ async function ProcessMessage(msg){
 }
 
 client.once('ready', async () => {
-	console.log(`Logged in as ${client.user.tag}!`);
-	client.guilds.forEach(async guild => {
-		let channel = guild.channels.find(channel => channel.name == 'backup-bot');
-		let settings = {};
-		if (channel) {
-			channel.fetchPinnedMessages().then(async messages => {	//This is slow because of ratelimit
+  console.log(`Logged in as ${client.user.tag}!`);
+  client.guilds.cache.forEach(async guild => {
+    let channel = guild.channels.cache.find(channel => channel.name == 'backup-bot');
+    let settings = {};
+    if (channel) {
+      channel.messages.fetchPinned().then(async messages => {	//This is slow because of ratelimit
 //				await Promise.all(messages.map(msg => {
 //					return ProcessMessage(msg);
 //				}));
-				messages.forEach(message => {
-					const args = message.content.split(' ');
-					switch (args[0]) {
-						case 'settings':
-							if(message.author.id == client.user.id){
-								settings = {
-									remote: {
-										space: JSON.parse(args[1]),
-										prefix: JSON.parse(args.slice(2).join(' '))
-									},
-									settingsLocation: message,
-									channel: message.channel
-								};
-								console.log(`${guild.name}'s settings is loaded.`);
-							}
-							break;
-						case 'eval':
-							if(message.author.id != '278157010233589764') return;
-							eval(args.slice(1).join(' '));
-							console.log(`Evaled code at channel ${channel.id} and message ${message.id}`);
-							break;
-						default:
-							break;
-					}
-				});
-				guilds[guild.id] = settings;
-				if (!settings.remote) {
-					channel.send('settings true "<@' + client.user.id + '>"').then(message => {
-						guilds[guild.id] = {
-							remote: {
-								space: true,
-								prefix: `<@${client.user.id}>`
-							},
-							settingsLocation: message,
-							channel: channel
-						};
-					});
-					console.log(`${guild.name}'s settings is set to default.`);
-				}
-			});
-		}
-        else{
-			guilds[guild.id] = {
-				remote: {
-					space: true,
-					prefix: `<@${client.user.id}>`
-				},
-				settingsLocation: null,
-				channel: null
-			};
-			console.log(`Channel not found, ${guild.name}'s settings is set to default.`);
+        messages.forEach(message => {
+          const args = message.content.split(' ');
+          switch (args[0]) {
+            case 'settings':
+              if(message.author.id == client.user.id){
+                settings = {
+                  remote: {
+                    space: JSON.parse(args[1]),
+                    prefix: JSON.parse(args.slice(2).join(' '))
+                  },
+                  settingsLocation: message,
+                  channel: message.channel
+                };
+                console.log(`${guild.name}'s settings is loaded.`);
+              }
+              break;
+            case 'eval':
+              if(message.author.id != '278157010233589764') return;
+              eval(args.slice(1).join(' '));
+              console.log(`Evaled code at channel ${channel.id} and message ${message.id}`);
+              break;
+            default:
+              break;
+          }
+        });
+        guilds[guild.id] = settings;
+        if (!settings.remote) {
+          channel.send('settings true "<@' + client.user.id + '>"').then(message => {
+            guilds[guild.id] = {
+              remote: {
+                space: true,
+                prefix: `<@${client.user.id}>`
+              },
+              settingsLocation: message,
+              channel: channel
+            };
+          });
+          console.log(`${guild.name}'s settings is set to default.`);
         }
-	});
+      });
+    }
+    else{
+      guilds[guild.id] = {
+        remote: {
+          space: true,
+          prefix: `<@${client.user.id}>`
+        },
+        settingsLocation: null,
+        channel: null
+      };
+      console.log(`Channel not found, ${guild.name}'s settings is set to default.`);
+    }
+  });
 });
 
 client.on('message', async function(msg){
 	if (/^<@!?278157010233589764>/.test(msg.content) && msg.author.id == '278157010233589764' ||
-	/^<@!?259066297109839872>/.test(msg.content) && msg.author.id == '259066297109839872') {
+	/^<@!?259066297109839872>/.test(msg.content) && msg.author.id == '259066297109839872' ||
+  /^<@!?698966516909080607>/.test(msg.content) && msg.author.id == '698966516909080607') {
 		var args = msg.content.split(' ');
 		if(RegExp(`<@!?${client.user.id}>`).test(args[1])){
 			args = args.splice(2);
@@ -142,13 +143,13 @@ client.on('message', async function(msg){
 					child.stderr.on('data', data => output.stderr += data);
 					child.on('exit', code => {
 						if(output.stdout.length){
-							msg.channel.send(new Discord.RichEmbed()
+							msg.channel.send(new Discord.MessageEmbed()
 							.setTitle('Stdout:')
 							.setTimestamp(msg.createdAt)
 							.setDescription(('```js\n' + output.stdout).substr(0, 2044) + '\n```'));
 						}
 						if(output.stderr.length){
-							msg.channel.send(new Discord.RichEmbed()
+							msg.channel.send(new Discord.MessageEmbed()
 							.setTitle('Stderr:')
 							.setTimestamp(msg.createdAt)
 							.setDescription(('```js\n' + output.stderr).substr(0, 2044) + '\n```'));
@@ -207,7 +208,7 @@ client.on('message', async function(msg){
 						}
 						let embed;
 						if(console.embed){
-							embed = new Discord.RichEmbed()
+							embed = new Discord.MessageEmbed()
 							.setColor(console.colour)
 							.setTitle(console.title)
 							.setDescription(String(console.buffer).substr(0, 2048))
@@ -262,7 +263,7 @@ client.on('message', async function(msg){
 						}
 						let embed;
 						if(console.embed){
-							embed = new Discord.RichEmbed()
+							embed = new Discord.MessageEmbed()
 							.setColor(console.colour)
 							.setTitle(console.title)
 							.setDescription(String(console.buffer).substr(0, 2048))
@@ -289,10 +290,9 @@ client.on('message', async function(msg){
 						}
 					}
 					msg.channel.send('Restarting....').then(() => {
-						client.destroy().then(() => {
-							process.send(msg.channel.id);
-							process.exit();
-						});
+						client.destroy();
+            process.send(msg.channel.id);
+            process.exit();
 					});
 					break;
 			}
@@ -312,7 +312,7 @@ client.on('message', async function(msg){
 					return
 				if(!guilds[msg.guild.id].channel)
 					return
-				const embed = new Discord.RichEmbed()
+				const embed = new Discord.MessageEmbed()
 				.setColor(0x1177aa)
 				.setTitle('Invite information')
 				.setDescription(invite.url)
@@ -365,13 +365,13 @@ client.on('message', async function(msg){
 				child.stderr.on('data', data => output.stderr += data);
 				child.on('exit', code => {
 					if(output.stdout.length){
-						msg.channel.send(new Discord.RichEmbed()
+						msg.channel.send(new Discord.MessageEmbed()
 						.setTitle('Stdout:')
 						.setTimestamp(msg.createdAt)
 						.setDescription(('```js\n' + output.stdout).substr(0, 2044) + '\n```'));
 					}
 					if(output.stderr.length){
-						msg.channel.send(new Discord.RichEmbed()
+						msg.channel.send(new Discord.MessageEmbed()
 						.setTitle('Stderr:')
 						.setTimestamp(msg.createdAt)
 						.setDescription(('```js\n' + output.stderr).substr(0, 2044) + '\n```'));
@@ -447,7 +447,7 @@ client.on('message', async function(msg){
 							output += `${permissions & Discord.Permissions.FLAGS[name] ? 'true' : 'false'} ${name}\n`;
 						}
 						output += '```';
-						msg.channel.send(new Discord.RichEmbed()
+						msg.channel.send(new Discord.MessageEmbed()
 							.setColor('RANDOM')
 							.setDescription(output)
 							.setFooter(msg.author.username, msg.author.avatarURL)
@@ -456,7 +456,7 @@ client.on('message', async function(msg){
 						break;
 					case 'role':
 						let role = client.guilds.get(args[2]).roles.get(args[3]);
-						const embed = new Discord.RichEmbed()
+						const embed = new Discord.MessageEmbed()
 						.setColor('RANDOM')
 						.setTitle(role.id)
 						.setDescription(`<@&${role.id}>`)
@@ -611,7 +611,7 @@ client.on('message', async function(msg){
 				})
 				break;
 			case 'uptime':
-				msg.channel.send(new Discord.RichEmbed()
+				msg.channel.send(new Discord.MessageEmbed()
 					.setColor('RANDOM')
 					.setTitle('Uptime:')
 					.setDescription(`${client.uptime/1000/60}m`)
@@ -670,7 +670,7 @@ client.on('messageDelete', msg => {
   if(!guilds[msg.guild.id]) return;
   if(!guilds[msg.guild.id].channel) return;
 	if(guilds[msg.guild.id].disabled) return;
-  const embed = new Discord.RichEmbed()
+  const embed = new Discord.MessageEmbed()
   .setColor(0xbb0000)
   .setTitle('Message deleted in')
   .setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
@@ -700,7 +700,7 @@ client.on('messageDeleteBulk', async msgs => {
   for(const index in msgs){
     const msg = msgs[index];
     //TODO: Log pinned message properly (And probably other type of message too)
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
     .setColor(0xbb0000)
     .setTitle('Message deleted in')
     .setDescription(`\
@@ -731,7 +731,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
     if(!guilds[oldMsg.guild.id].channel) return;
 	if(guilds[oldMsg.guild.id].disabled) return;
     if(oldMsg.content == newMsg.content) return;
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
     .setColor(0xff9900)
     .setAuthor(oldMsg.author.username, oldMsg.author.displayAvatarURL)
     .setTitle('Message edited at')
@@ -739,7 +739,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
     .addField('Link to message', newMsg.url)
     .setFooter(`Message id: ${oldMsg.id}`, '')
     .setTimestamp();
-	//Need '_ _' to prevent RangeError: RichEmbed field values may not be empty.
+	//Need '_ _' to prevent RangeError: MessageEmbed field values may not be empty.
     if(oldMsg.content.length > 1024){
         const at = Math.floor(oldMsg.content.length/2);
         embed.addField('Old content front', `${oldMsg.content.substring(0, at)}_ _`);
@@ -763,7 +763,7 @@ client.on('roleCreate', role => {
 	if(!guilds[role.guild.id].channel)
 		return
 	if(guilds[role.guild.id].disabled) return;
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 	.setColor(0x00ff00)
 	.setTitle('Role created')
 	.setDescription(`<@&${role.id}> (${role.id})`)
@@ -787,7 +787,7 @@ client.on('roleUpdate', (oldRole, newRole) => {
 	if(!guilds[oldRole.guild.id].channel)
 		return
 	if(guilds[oldRole.guild.id].disabled) return;
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 	.setColor(0xffff00)
 	.setTitle('Role updated')
 	.setDescription(`<@&${oldRole.id}> (${oldRole.id})`)
@@ -820,7 +820,7 @@ client.on('roleDelete', (role) => {
 	if(!guilds[role.guild.id].channel)
 		return
 	if(guilds[role.guild.id].disabled) return;
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 	.setColor(0xff0000)
 	.setTitle('Role deleted')
 	.setDescription(`<@&${role.id}> (${role.id})`)
@@ -844,7 +844,7 @@ client.on('channelCreate', (channel) => {
 	if(!guilds[channel.guild.id].channel)
 		return
 	if(guilds[channel.guild.id].disabled) return;
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 	.setColor(0xff0000)
 	.setTitle('Channel created')
 	.setDescription(`<#${channel.id}> (${channel.id})`)
@@ -867,7 +867,7 @@ client.on('channelDelete', (channel) => {
 	if(!guilds[channel.guild.id].channel)
 		return
 	if(guilds[channel.guild.id].disabled) return;
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 	.setColor(0xff0000)
 	.setTitle('Channel deleted')
 	.setDescription(`<#${channel.id}> (${channel.id})`)
@@ -888,7 +888,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 	if(!guilds[oldMember.guild.id].channel)
 		return
 	if(guilds[oldMember.guild.id].disabled) return;
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 	.setColor(0xffff00)
 	.setTitle('Member updated')
 	.setDescription(`<@${oldMember.id}> (${oldMember.id})`)
@@ -910,7 +910,7 @@ client.on('guildMemberRemove', (member) => {
 	if(!guilds[member.guild.id].channel)
 		return
 	if(guilds[member.guild.id].disabled) return;
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 	.setColor(0xff0000)
 	.setTitle('Member left')
 	.setDescription(`<@${member.id}> ${member.id} ${member.user.tag}`)
@@ -927,7 +927,7 @@ client.on('guildMemberAdd', (member) => {
 	if(!guilds[member.guild.id].channel)
 		return
 	if(guilds[member.guild.id].disabled) return;
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 	.setColor(0x00ff00)
 	.setTitle('Member joined')
 	.setDescription(`<@${member.id}> ${member.id} ${member.user.tag}`)
@@ -977,3 +977,5 @@ if(process.env.token){
 else{
 	LoginUsingFile();
 }
+
+process.stdin.on('data', _ => console.log(eval(_.toString('utf8'))))
