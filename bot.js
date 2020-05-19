@@ -464,7 +464,7 @@ client.on('message', async function(msg){
 						.addField('Colour', '0x' + role.color.toString(16).padStart(6, '0'), true)
 						.addField('Hoist', role.hoist, true)
 						.addField('Position', role.position, true)
-						.addField('Permissions', role.permissions, true)
+						.addField('Permissions', role.permissions.bitfield, true)
 						.addField('Managed', role.managed, true)
 						.addField('Mentionable', role.mentionable, true)
 						.setFooter(msg.author.username, msg.author.displayAvatarURL({ size: 32 }))
@@ -771,7 +771,7 @@ client.on('roleCreate', role => {
 	.addField('Colour', '0x' + role.color.toString(16).padStart(6, '0'), true)
 	.addField('Hoist', role.hoist, true)
 	.addField('Position', role.position, true)
-	.addField('Permissions', role.permissions, true)
+	.addField('Permissions', role.permissions.bitfield, true)
 	.addField('Managed', role.managed, true)
 	.addField('Mentionable', role.mentionable, true)
 //	.addField('Calculated position', role.calculatedPosition, true)
@@ -801,8 +801,8 @@ client.on('roleUpdate', (oldRole, newRole) => {
 		embed.addField('Hoist', `${oldRole.hoist} -> ${newRole.hoist}`, true);
 	if(oldRole.position != newRole.position)
 		embed.addField('Position', `${oldRole.position} -> ${newRole.position}`, true);
-	if(oldRole.permissions != newRole.permissions)
-		embed.addField('Permissions', `${oldRole.permissions} -> ${newRole.permissions}`, true);
+	if(oldRole.permissions.bitfield != newRole.permissions.bitfield)
+		embed.addField('Permissions', `${oldRole.permissions.bitfield} -> ${newRole.permissions.bitfield}`, true);
 	if(oldRole.managed != newRole.managed)
 		embed.addField('Managed', `${oldRole.managed} -> ${newRole.managed}`, true);
 	if(oldRole.mentionable != newRole.mentionable)
@@ -828,7 +828,7 @@ client.on('roleDelete', (role) => {
 	.addField('Colour', '0x' + role.color.toString(16).padStart(6, '0'), true)
 	.addField('Hoist', role.hoist, true)
 	.addField('Position', role.position, true)
-	.addField('Permissions', role.permissions, true)
+	.addField('Permissions', role.permissions.bitfield, true)
 	.addField('Managed', role.managed, true)
 	.addField('Mentionable', role.mentionable, true)
 //	.addField('Calculated position', role.calculatedPosition, true)
