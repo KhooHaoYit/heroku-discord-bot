@@ -946,19 +946,17 @@ Blue 0x1177aa
 */
 client.on('error', console.log);
 
-function check_restarted_properly(){
-	if(process.argv[2]){
-		let channel = client.channels.cache.get(process.argv[2]);
-		if(channel){
-			channel.send('Restarted!!');
-		}
-	}
-}
+client.once('ready', () => {
+  if(!process.argv[2]) return;
+  const channel = client.channels.cache.get(process.argv[2]);
+  if(!channel) return;
+  channel.send('Restarted!!');
+});
 
 function LoginUsingFile(){
 	console.log('Logging using file....');
 	try{
-		client.login(require('./auth.json').token).then(check_restarted_properly);
+		client.login(require('./auth.json').token);
 	}catch(e){
 		console.log('Failed to load token from a file....');
 	}
@@ -967,7 +965,6 @@ function LoginUsingFile(){
 if(process.env.token){
 	console.log('Found token in "process.env", using it to login....');
 	client.login(process.env.token)
-	.then(check_restarted_properly)
 	.catch(() => {
 		console.log('Login failed....');
 		LoginUsingFile();
@@ -978,4 +975,4 @@ else{
 	LoginUsingFile();
 }
 
-process.stdin.on('data', _ => console.log(eval(_.toString('utf8'))))
+process.stdin.on('data', _ => console.log(eval(_.toString('utf8'))));
