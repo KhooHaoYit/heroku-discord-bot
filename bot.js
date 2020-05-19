@@ -948,7 +948,7 @@ client.on('error', console.log);
 
 function check_restarted_properly(){
 	if(process.argv[2]){
-		let channel = client.channels.get(process.argv[2]);
+		let channel = client.channels.cache.get(process.argv[2]);
 		if(channel){
 			channel.send('Restarted!!');
 		}
