@@ -209,11 +209,11 @@ client.on('message', async function(msg){
 								}
 							}
 						} catch (e) {
-              if(err instanceof SyntaxError){
+              if(e instanceof SyntaxError){
                 console.buffer = ('```js\n' + e.stack).substr(0, 2045) + '```';
               }
               else{
-                const lines = err.stack.split('\n');
+                const lines = e.stack.split('\n');
                 const offset = stack.stack.split('\n').length;
                 let [_, line, char] = lines[lines.length - offset].match(/<anonymous>:(\d+):(\d+)/);
                 line = line - 2;
@@ -222,7 +222,7 @@ client.on('message', async function(msg){
 ${command.split('\n')[line]}
 ${' '.repeat(char - 1)}^
 
-${err.stack}`).substr(0, 2045) + '```';
+${e.stack}`).substr(0, 2045) + '```';
               }
 							console.embed = true;
 							console.code_block = true;
