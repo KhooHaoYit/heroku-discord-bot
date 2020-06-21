@@ -1,6 +1,7 @@
 'use strict';
 const st_hd = require('./settings handler.js');
 const Discord = require('discord.js');
+const vm = require('vm');
 const client = new Discord.Client({ disableEveryone: true });
 
 const guilds = {};
@@ -189,10 +190,16 @@ client.on('message', async function(msg){
 							log: (input) => console.buffer += (input + '\n'),
 							real_log: require('./wrapper.js').console.log
 						}
+            const stack = {};
+            Error.captureStackTrace(stack);
 						let returned;
 						try {
-							returned = await (async () => {}).constructor
-							('require', 'console', 'Discord', 'client', 'msg', 'value', 'guilds', command)(require, console, Discord, client, msg, value, guilds);
+              try{
+                returned = await eval(`async()=>{\n${command}\n}`)();
+              } catch(err){
+                if(!(err instanceof SyntaxError)) throw err;
+                vm.runInNewContext(command, {}, 'emitSyntaxError.vm'); //Cause a error
+              }
 							if(console.code_block){
 								if(console.buffer.length){
 									console.buffer = ('```js\n' + console.buffer).substr(0, 2045) + '```';
@@ -202,7 +209,21 @@ client.on('message', async function(msg){
 								}
 							}
 						} catch (e) {
-							console.buffer = ('```js\n' + e.stack).substr(0, 2045) + '```';
+              if(err instanceof SyntaxError){
+                console.buffer = ('```js\n' + e.stack).substr(0, 2045) + '```';
+              }
+              else{
+                const lines = err.stack.split('\n');
+                const offset = stack.stack.split('\n').length;
+                let [_, line, char] = lines[lines.length - offset].match(/<anonymous>:(\d+):(\d+)/);
+                line = line - 2;
+                char = +char;
+                console.buffer = ('```js\n' + `
+${command.split('\n')[line]}
+${' '.repeat(char - 1)}^
+
+${err.stack}`)).substr(0, 2045) + '```';
+              }
 							console.embed = true;
 							console.code_block = true;
 						}
