@@ -213,16 +213,21 @@ client.on('message', async function(msg){
                 console.buffer = ('```js\n' + e.stack).substr(0, 2045) + '```';
               }
               else{
-                const lines = e.stack.split('\n');
-                const offset = stack.stack.split('\n').length;
-                let [_, line, char] = lines[lines.length - offset].match(/<anonymous>:(\d+):(\d+)/);
-                line = line - 2;
-                char = +char;
-                console.buffer = ('```js\n' + `
+                try{
+                  const lines = e.stack.split('\n');
+                  const offset = stack.stack.split('\n').length - 1;
+                  let [_, line, char] = lines[lines.length - offset].match(/<anonymous>:(\d+):(\d+)/);
+                  line = line - 2;
+                  char = +char;
+                  console.buffer = ('```js\n' + `
 ${command.split('\n')[line]}
 ${' '.repeat(char - 1)}^
 
 ${e.stack}`).substr(0, 2045) + '```';
+                } catch(_){
+                  console.real_log(_);
+                  console.buffer = ('```js\n' + e.stack).substr(0, 2045) + '```';
+                }
               }
 							console.embed = true;
 							console.code_block = true;
