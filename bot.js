@@ -222,7 +222,7 @@ client.on('message', async function(msg){
 ${command.split('\n')[line]}
 ${' '.repeat(char - 1)}^
 
-${err.stack}`)).substr(0, 2045) + '```';
+${err.stack}`).substr(0, 2045) + '```';
               }
 							console.embed = true;
 							console.code_block = true;
