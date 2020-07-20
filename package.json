@@ -25,6 +25,7 @@
     "node-fetch": "^2.6.0",
     "node-html-parser": "^1.2.16",
     "node-osu": "^2.2.0",
+    "qrcode": "^1.4.4",
     "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.2",
     "ytdl-core": "^2.1.4",
