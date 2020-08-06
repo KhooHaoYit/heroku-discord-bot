@@ -987,7 +987,7 @@ client.on('messageReactionAdd', (messageReaction, user) => {
   .addField('Emoji', `${emoji} :${emoji.name}: (${emoji.id})`)
 	.setThumbnail(user.displayAvatarURL({ size: 2048 }))
 	.setTimestamp();
-	guilds[member.guild.id].channel.send({embed});
+	guilds[guild.id].channel.send({embed});
 });
 
 client.on('messageReactionRemove', (messageReaction, user) => {
@@ -1006,7 +1006,7 @@ client.on('messageReactionRemove', (messageReaction, user) => {
   .addField('Emoji', `${emoji} :${emoji.name}: (${emoji.id})`)
 	.setThumbnail(user.displayAvatarURL({ size: 2048 }))
 	.setTimestamp();
-	guilds[member.guild.id].channel.send({embed});
+	guilds[guild.id].channel.send({embed});
 });
 /*
 Red 0xff0000
