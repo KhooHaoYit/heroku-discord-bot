@@ -972,7 +972,7 @@ client.on('guildMemberAdd', (member) => {
 });
 
 client.on('messageReactionAdd', (messageReaction, user) => {
-  const guild = messageReaction.message.guild;
+  const msg = messageReaction.message, guild = msg.guild;
 	if(!guild)
 		return
 	if(!guilds[guild.id])
@@ -983,7 +983,7 @@ client.on('messageReactionAdd', (messageReaction, user) => {
 	const emoji = messageReaction.emoji, embed = new Discord.MessageEmbed()
 	.setColor(0xaddfff)
 	.setTitle('Reaction added')
-	.setDescription(`<@${user.id}> ${user.id} ${user.tag}`)
+	.setDescription(`<@${user.id}> ${user.id} ${user.tag}\n${msg.url}`)
   .addField('Emoji', `${emoji} :${emoji.name}: (${emoji.id})`)
 	.setThumbnail(user.displayAvatarURL({ size: 2048 }))
 	.setTimestamp();
@@ -991,7 +991,7 @@ client.on('messageReactionAdd', (messageReaction, user) => {
 });
 
 client.on('messageReactionRemove', (messageReaction, user) => {
-  const guild = messageReaction.message.guild;
+  const msg = messageReaction.message, guild = msg.guild;
 	if(!guild)
 		return
 	if(!guilds[guild.id])
@@ -1002,7 +1002,7 @@ client.on('messageReactionRemove', (messageReaction, user) => {
 	const emoji = messageReaction.emoji, embed = new Discord.MessageEmbed()
 	.setColor(0xaddfff)
 	.setTitle('Reaction removed')
-	.setDescription(`<@${user.id}> ${user.id} ${user.tag}`)
+	.setDescription(`<@${user.id}> ${user.id} ${user.tag}\n${msg.url}`)
   .addField('Emoji', `${emoji} :${emoji.name}: (${emoji.id})`)
 	.setThumbnail(user.displayAvatarURL({ size: 2048 }))
 	.setTimestamp();
