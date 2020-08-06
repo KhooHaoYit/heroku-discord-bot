@@ -768,7 +768,6 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
   if(oldMsg.content == newMsg.content) return;
   const embed = new Discord.MessageEmbed()
   .setColor(0xff9900)
-  .setAuthor(newMsg.author.username, newMsg.author.displayAvatarURL({ size: 32 }))
   .setTitle('Message edited at')
   .setDescription(`<#${newMsg.channel.id}> ${newMsg.channel.id} \`#${newMsg.channel.name}\``)
   .addField('Link to message', newMsg.url)
@@ -792,6 +791,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
       embed.addField('New content end', `_ _ ${newMsg.content.substring(at)}`);
     }
     else embed.addField('New content', newMsg.content || '_ _');
+    embed.setAuthor(newMsg.author.username, newMsg.author.displayAvatarURL({ size: 32 }))
   }
   guilds[oldMsg.guild.id].channel.send({embed}).catch(console.log);
 });
