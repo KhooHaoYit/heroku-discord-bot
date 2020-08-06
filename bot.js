@@ -704,17 +704,20 @@ client.on('messageDelete', msg => {
   .setTitle('Message deleted in')
   .setDescription(`<#${msg.channel.id}> ${msg.channel.id} \`#${msg.channel.name}\``)
   .setFooter(`Message id: ${msg.id}`, '')
-  .setAuthor(msg.author.tag, msg.author.displayAvatarURL({ size: 32 }))
   .setTimestamp();
-  if(msg.content.length > 1024){
-      const at = Math.floor(msg.content.length/2);
-      embed.addField('Content front', `${msg.content.substring(0, at)}_ _`);
-      embed.addField('Content end', `_ _ ${msg.content.substring(at)}`);
-  }
+  if(msg.partial) embed.addField('Partial', 'True');
   else{
-      embed.addField('Content', msg.content || '_ _');
+    embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL({ size: 32 }));
+    if(msg.content.length > 1024){
+        const at = Math.floor(msg.content.length/2);
+        embed.addField('Content front', `${msg.content.substring(0, at)}_ _`);
+        embed.addField('Content end', `_ _ ${msg.content.substring(at)}`);
+    }
+    else{
+        embed.addField('Content', msg.content || '_ _');
+    }
+    msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
   }
-  msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
   guilds[msg.guild.id].channel.send({embed}).catch(e => { console.log(e.stack); });
 });
 
@@ -739,17 +742,20 @@ First message id: ${firstMsg.id}
 Current index: ${Number(index) + 1}/${msgs.length}\
 `)
     .setFooter(`Message id: ${msg.id}`, '')
-    .setAuthor(msg.author.tag, msg.author.displayAvatarURL({ size: 32 }))
     .setTimestamp();
-    if(msg.content.length > 1024){
-        const at = Math.floor(msg.content.length/2);
-        embed.addField('Content front', `${msg.content.substring(0, at)}_ _`);
-        embed.addField('Content end', `_ _ ${msg.content.substring(at)}`);
-    }
+    if(msg.partial) embed.addField('Partial', 'True');
     else{
-        embed.addField('Content', msg.content || '_ _');
+      embed.setAuthor(msg.author.tag, msg.author.displayAvatarURL({ size: 32 }))
+      if(msg.content.length > 1024){
+          const at = Math.floor(msg.content.length/2);
+          embed.addField('Content front', `${msg.content.substring(0, at)}_ _`);
+          embed.addField('Content end', `_ _ ${msg.content.substring(at)}`);
+      }
+      else{
+          embed.addField('Content', msg.content || '_ _');
+      }
+      msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
     }
-    msg.attachments.forEach(ath => embed.addField('Attachment', ath.url));
     await guilds[msg.guild.id].channel.send({embed}).catch(e => { console.log(e.stack); });
   }
 });
@@ -961,6 +967,44 @@ client.on('guildMemberAdd', (member) => {
 	.setTitle('Member joined')
 	.setDescription(`<@${member.id}> ${member.id} ${member.user.tag}`)
 	.setThumbnail(member.user.displayAvatarURL({ size: 2048 }))
+	.setTimestamp();
+	guilds[member.guild.id].channel.send({embed});
+});
+
+client.on('messageReactionAdd', (messageReaction, user) => {
+  const guild = messageReaction.message.guild;
+	if(!guild)
+		return
+	if(!guilds[guild.id])
+		return
+	if(!guilds[guild.id].channel)
+		return
+	if(guilds[guild.id].disabled) return;
+	const emoji = messageReaction.emoji, embed = new Discord.MessageEmbed()
+	.setColor(0xaddfff)
+	.setTitle('Reaction added')
+	.setDescription(`<@${user.id}> ${user.id} ${user.tag}`)
+  .addField('Emoji', `${emoji} :${emoji.name}: (${emoji.id})`)
+	.setThumbnail(user.displayAvatarURL({ size: 2048 }))
+	.setTimestamp();
+	guilds[member.guild.id].channel.send({embed});
+});
+
+client.on('messageReactionRemove', (messageReaction, user) => {
+  const guild = messageReaction.message.guild;
+	if(!guild)
+		return
+	if(!guilds[guild.id])
+		return
+	if(!guilds[guild.id].channel)
+		return
+	if(guilds[guild.id].disabled) return;
+	const emoji = messageReaction.emoji, embed = new Discord.MessageEmbed()
+	.setColor(0xaddfff)
+	.setTitle('Reaction removed')
+	.setDescription(`<@${user.id}> ${user.id} ${user.tag}`)
+  .addField('Emoji', `${emoji} :${emoji.name}: (${emoji.id})`)
+	.setThumbnail(user.displayAvatarURL({ size: 2048 }))
 	.setTimestamp();
 	guilds[member.guild.id].channel.send({embed});
 });
