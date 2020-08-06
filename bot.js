@@ -2,7 +2,10 @@
 const st_hd = require('./settings handler.js');
 const Discord = require('discord.js');
 const vm = require('vm');
-const client = new Discord.Client({ disableEveryone: true });
+const client = new Discord.Client({
+  disableEveryone: true,
+  partials: 'USER CHANNEL GUILD_MEMBER MESSAGE REACTION'.split(' ')
+});
 
 const guilds = {};
 const value = {};
@@ -752,33 +755,33 @@ Current index: ${Number(index) + 1}/${msgs.length}\
 });
 
 client.on('messageUpdate', (oldMsg, newMsg) => {
-    if(!oldMsg.guild) return;
-    if(!guilds[oldMsg.guild.id]) return;
-    if(!guilds[oldMsg.guild.id].channel) return;
+  if(!oldMsg.guild) return;
+  if(!guilds[oldMsg.guild.id]) return;
+  if(!guilds[oldMsg.guild.id].channel) return;
 	if(guilds[oldMsg.guild.id].disabled) return;
-    if(oldMsg.content == newMsg.content) return;
-    const embed = new Discord.MessageEmbed()
-    .setColor(0xff9900)
-    .setAuthor(oldMsg.author.username, oldMsg.author.displayAvatarURL({ size: 32 }))
-    .setTitle('Message edited at')
-    .setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
-    .addField('Link to message', newMsg.url)
-    .setFooter(`Message id: ${oldMsg.id}`, '')
-    .setTimestamp();
+  if(oldMsg.content == newMsg.content) return;
+  const embed = new Discord.MessageEmbed()
+  .setColor(0xff9900)
+  .setAuthor(oldMsg.author.username, oldMsg.author.displayAvatarURL({ size: 32 }))
+  .setTitle('Message edited at')
+  .setDescription(`<#${oldMsg.channel.id}> ${oldMsg.channel.id} \`#${oldMsg.channel.name}\``)
+  .addField('Link to message', newMsg.url)
+  .setFooter(`Message id: ${oldMsg.id}`, '')
+  .setTimestamp();
 	//Need '_ _' to prevent RangeError: MessageEmbed field values may not be empty.
-    if(oldMsg.content.length > 1024){
-        const at = Math.floor(oldMsg.content.length/2);
-        embed.addField('Old content front', `${oldMsg.content.substring(0, at)}_ _`);
-        embed.addField('Old content end', `_ _${oldMsg.content.substring(at)}`);
-    }
-    else embed.addField('Old content', oldMsg.content || '_ _');
-    if(newMsg.content.length > 1024){
-        const at = Math.floor(newMsg.content.length/2);
-        embed.addField('New content front', `${newMsg.content.substring(0, at)}_ _`);
-        embed.addField('New content end', `_ _ ${newMsg.content.substring(at)}`);
-    }
-    else embed.addField('New content', newMsg.content || '_ _');
-    guilds[oldMsg.guild.id].channel.send({embed}).catch(console.log);
+  if(oldMsg.content.length > 1024){
+    const at = Math.floor(oldMsg.content.length/2);
+    embed.addField('Old content front', `${oldMsg.content.substring(0, at)}_ _`);
+    embed.addField('Old content end', `_ _${oldMsg.content.substring(at)}`);
+  }
+  else embed.addField('Old content', oldMsg.content || '_ _');
+  if(newMsg.content.length > 1024){
+    const at = Math.floor(newMsg.content.length/2);
+    embed.addField('New content front', `${newMsg.content.substring(0, at)}_ _`);
+    embed.addField('New content end', `_ _ ${newMsg.content.substring(at)}`);
+  }
+  else embed.addField('New content', newMsg.content || '_ _');
+  guilds[oldMsg.guild.id].channel.send({embed}).catch(console.log);
 });
 
 client.on('roleCreate', role => {
