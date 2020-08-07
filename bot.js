@@ -979,11 +979,8 @@ client.on('guildMemberAdd', (member) => {
 
 client.on('messageReactionAdd', (messageReaction, user) => {
   const msg = messageReaction.message, guild = msg.guild;
-	if(!guild)
-		return
-	if(!guilds[guild.id])
-		return
-	if(!guilds[guild.id].channel)
+    channel = guild.channels.cache.filter(c => c.name == 'backup-bot-reaction').first();
+	if(!channel)
 		return
 	if(guilds[guild.id].disabled) return;
 	const emoji = messageReaction.emoji, embed = new Discord.MessageEmbed()
@@ -993,16 +990,13 @@ client.on('messageReactionAdd', (messageReaction, user) => {
   .addField('Emoji', `${emoji} :${emoji.name}: (${emoji.id})`)
 	.setThumbnail(user.displayAvatarURL({ size: 2048 }))
 	.setTimestamp();
-	guilds[guild.id].channel.send({embed});
+	channel.send({embed});
 });
 
 client.on('messageReactionRemove', (messageReaction, user) => {
-  const msg = messageReaction.message, guild = msg.guild;
-	if(!guild)
-		return
-	if(!guilds[guild.id])
-		return
-	if(!guilds[guild.id].channel)
+  const msg = messageReaction.message, guild = msg.guild,
+    channel = guild.channels.cache.filter(c => c.name == 'backup-bot-reaction').first();
+	if(!channel)
 		return
 	if(guilds[guild.id].disabled) return;
 	const emoji = messageReaction.emoji, embed = new Discord.MessageEmbed()
@@ -1012,7 +1006,7 @@ client.on('messageReactionRemove', (messageReaction, user) => {
   .addField('Emoji', `${emoji} :${emoji.name}: (${emoji.id})`)
 	.setThumbnail(user.displayAvatarURL({ size: 2048 }))
 	.setTimestamp();
-	guilds[guild.id].channel.send({embed});
+	channel.send({embed});
 });
 /*
 Red 0xff0000
