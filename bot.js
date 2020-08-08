@@ -978,7 +978,7 @@ client.on('guildMemberAdd', (member) => {
 });
 
 client.on('messageReactionAdd', (messageReaction, user) => {
-  const msg = messageReaction.message, guild = msg.guild;
+  const msg = messageReaction.message, guild = msg.guild,
     channel = guild.channels.cache.filter(c => c.name == 'backup-bot-reaction').first();
 	if(!channel)
 		return
