@@ -766,6 +766,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
   if(!guilds[newMsg.guild.id].channel) return;
 	if(guilds[newMsg.guild.id].disabled) return;
   if(oldMsg.content == newMsg.content) return;
+  if(newMsg.channel.id == '547001590301589504') return;
   const embed = new Discord.MessageEmbed()
   .setColor(0xff9900)
   .setTitle('Message edited at')
