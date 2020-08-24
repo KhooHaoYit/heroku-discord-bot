@@ -182,6 +182,7 @@ client.on('message', async function(msg){
 						else{
 							command = command.join('```');
 						}
+            command = `async()=>{\n${command}\n}`;
 						let console = {
 							embed: true,
 							image: '',
@@ -198,7 +199,7 @@ client.on('message', async function(msg){
 						let returned;
 						try {
               try{
-                returned = await eval(`async()=>{\n${command}\n}`)();
+                returned = await eval(command)();
               } catch(err){
                 if(!(err instanceof SyntaxError)) throw err;
                 vm.runInNewContext(command, {}, 'emitSyntaxError.vm'); //Cause a error
