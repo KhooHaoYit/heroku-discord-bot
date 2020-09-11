@@ -980,8 +980,9 @@ client.on('guildMemberAdd', (member) => {
 });
 
 client.on('messageReactionAdd', (messageReaction, user) => {
-  const msg = messageReaction.message, guild = msg.guild,
-    channel = guild.channels.cache.filter(c => c.name == 'backup-bot-reaction').first();
+  const msg = messageReaction.message, guild = msg.guild;
+  if(!guild) return;
+  const channel = guild.channels.cache.filter(c => c.name == 'backup-bot-reaction').first();
 	if(!channel)
 		return
 	if(guilds[guild.id].disabled) return;
@@ -996,8 +997,9 @@ client.on('messageReactionAdd', (messageReaction, user) => {
 });
 
 client.on('messageReactionRemove', (messageReaction, user) => {
-  const msg = messageReaction.message, guild = msg.guild,
-    channel = guild.channels.cache.filter(c => c.name == 'backup-bot-reaction').first();
+  const msg = messageReaction.message, guild = msg.guild;
+  if(!guild) return;
+  const channel = guild.channels.cache.filter(c => c.name == 'backup-bot-reaction').first();
 	if(!channel)
 		return
 	if(guilds[guild.id].disabled) return;
