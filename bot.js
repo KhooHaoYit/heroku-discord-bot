@@ -221,7 +221,7 @@ client.on('message', async function(msg){
                   const lines = e.stack.split('\n');
                   const offset = stack.stack.split('\n').length - 1;
                   let [_, line, char] = lines[lines.length - offset].match(/<anonymous>:(\d+):(\d+)/);
-                  line = line - 2;
+                  line = line - 1;
                   char = +char;
                   console.buffer = ('```js\n' + `
 ${command.split('\n')[line]}
@@ -304,26 +304,17 @@ ${e.stack}`).substr(0, 2045) + '```';
 					}
 					break;
 				case 'rs':
-					if(args[1] != process.pid){
-						msg.channel.send(`Pid didn't match, my pid is ${process.pid}`);
-						break;
-					}
-					if(args[2] == 'random'){
-						process_value['rs'] = Math.random().toString();
-						msg.channel.send(`My random value is ${process_value['rs']}`);
-						break;
-					}
-					if(process_value['rs']){
-						if(args[2] != process_value['rs']){
-							msg.channel.send(`Random value didn't match, my random value is ${process_value['rs']}`);
-							break;
-						}
-					}
-					msg.channel.send('Restarting....').then(() => {
-						client.destroy();
-            process.send(msg.channel.id);
-            process.exit();
-					});
+          const emoji = '🔄';
+					const rsMsg = await msg.channel.send(`My pid is ${process.pid}`);
+          await rsMsg.react(emoji);
+          const collected = await rsMsg.awaitReactions((reaction, user) => {
+            return reaction.emoji.name == emoji && user.id == '278157010233589764';
+          }, { time: 30000, max: 1, maxEmojis: 1, maxUsers: 1 });
+          if(!collected.size) return await rsMsg.edit(`[${process.pid}] Bot didn't receive restart command`);
+					await rsMsg.edit(`[${process.pid}] Restarting....`);
+  				client.destroy();
+          process.send(msg.channel.id);
+          process.exit();
 					break;
 			}
 		}
@@ -331,7 +322,8 @@ ${e.stack}`).substr(0, 2045) + '```';
 	if (msg.content == `<@${client.user.id}> Help!!`) {
 		msg.channel.send(`${guilds[msg.guild.id].remote.prefix + (guilds[msg.guild.id].remote.space ? ' ' : '')}COMMAND`);
 	}
-	let invites = msg.content.match(/discord.gg\/\S+/g);
+  if(!msg.guild) return;
+  let invites = msg.content.match(/discord.gg\/\S+/g);
 	if(!guilds[msg.guild.id].disabled && invites){
 		invites.forEach(invite => {
 			client.fetchInvite(invite)
