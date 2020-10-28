@@ -96,7 +96,7 @@ client.once('ready', async () => {
       guilds[guild.id] = {
         remote: {
           space: true,
-          prefix: `<@${client.user.id}>`
+          prefix: `<@!${client.user.id}>`
         },
         settingsLocation: null,
         channel: null
