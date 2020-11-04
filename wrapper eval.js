@@ -1,5 +1,5 @@
 'use strict';
-const Discord = require('discord.js');
+//const Discord = require('discord.js'); //console.log(client._eval('eval')) exploit
 function run(command){
 	let wrapper = undefined;
 	let process = undefined;
