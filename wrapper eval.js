@@ -6,7 +6,9 @@ const vm = require('vm');
 
 const untrustedCode = process.argv[2];
 
-vm.runInNewContext(`\
+const returned = vm.runInNewContext(`\
 'use strict';
 vm.runInNewContext(untrustedCode, {});
-`, { vm, untrustedCode })
+`, { vm, untrustedCode });
+
+console.log(returned);
