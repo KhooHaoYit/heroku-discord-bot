@@ -1,4 +1,5 @@
 'use strict';
+
 function run(channelID){
 	const { spawn } = require('child_process');
 	let child = spawn('node', ['bot.js', channelID], { stdio: [0, 1, 2, 'ipc'] });
