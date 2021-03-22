@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
-    "@jorgeferrero/stream-to-buffer": "^2.0.6",
     "bancho.js": "^0.9.7",
     "base32768": "^2.0.0",
     "bufferutil": "^4.0.1",
