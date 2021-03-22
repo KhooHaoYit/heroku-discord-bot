@@ -31,7 +31,6 @@
     "node-osu": "^2.2.0",
     "puppeteer": "^5.2.1",
     "qrcode": "^1.4.4",
-    "runtime-npm-install": "^5.0.0",
     "sodium": "^3.0.2",
     "stream-to-array": "^2.3.0",
     "utf-8-validate": "^5.0.2",
